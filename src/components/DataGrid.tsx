@@ -17,7 +17,7 @@ type tableData = {
 };
 
 const columns: GridColDef[] = [
-  { field: "_id", headerName: "ID", width: 210 },
+  { field: "phoneNumber", headerName: "Phone number", width: 210 },
   {
     field: "firstName",
     headerName: "First name",
