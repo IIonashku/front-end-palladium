@@ -11,7 +11,6 @@ import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
 import MenuIcon from "@mui/icons-material/Menu";
-import Grid from "@mui/material/Grid";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { defaultTheme } from "../themes/theme.ts";
 import { Copyright } from "@mui/icons-material";
@@ -72,7 +71,6 @@ const Drawer = styled(MuiDrawer, {
 export default function Main() {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
-    console.log(open);
     setOpen(!open);
   };
 
@@ -135,13 +133,17 @@ export default function Main() {
             overflow: "auto",
           }}>
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12}>
-                <TableGrid />
-              </Grid>
-            </Grid>
+          <Container
+            maxWidth="lg"
+            sx={{
+              mt: 4,
+              mb: 4,
+              ml: 0,
+              mr: 0,
+              display: "flex",
+              justifyItems: "baseline",
+            }}>
+            <TableGrid />
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>

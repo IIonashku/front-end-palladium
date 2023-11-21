@@ -7,10 +7,9 @@ export default function UploadForm() {
   const [files, setFiles] = useState<FileList | []>([]);
 
   const handleFileSelection = (event: React.FormEvent) => {
-    console.log(event);
     const files = (event.target as HTMLInputElement).files;
     if (files && files.length > 0) {
-      console.log(setFiles(files));
+      setFiles(files);
     }
   };
 
@@ -18,10 +17,8 @@ export default function UploadForm() {
     const formData = new FormData();
     //formData.append("files", files[0]);
     for (let i = 0; i < files.length; i += 1) {
-      console.log(files[i]);
       formData.append("files", files[i]);
     }
-    console.log(formData.values());
     axios
       .post(backEndUrl + "/csv/upload", formData, {
         headers: {
