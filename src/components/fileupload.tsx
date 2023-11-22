@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { backEndUrl } from "../config.ts";
-import AnalysisGrid from "./UploadDataGrid.tsx";
 import { Box } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { string } from "prop-types";
 
 const columns: GridColDef[] = [
   { field: "notValid", headerName: "Not Valid", width: 110 },
@@ -30,14 +28,6 @@ const columns: GridColDef[] = [
     width: 310,
   },
 ];
-
-type analisis = {
-  notValid: number;
-  duplicateInFile: number;
-  dublicateInMongo: number;
-  data: number;
-  fileName: string;
-};
 
 export default function UploadForm() {
   const [files, setFiles] = useState<FileList | []>([]);
@@ -92,24 +82,30 @@ export default function UploadForm() {
   };
 
   return (
-    <Box sx={{ display: "inline-table" }}>
-      <DataGrid
-        sx={{
-          margin: 5,
-          minHeight: 400,
-          maxWidth: "100%",
-          color: "white",
-        }}
-        rows={data}
-        paginationMode="server"
-        rowCount={dataLenght}
-        paginationModel={paginationModel}
-        columns={columns}
-        getRowId={(row) => row.fileName}
-        disableRowSelectionOnClick
-        onPaginationModelChange={pageChange}
-      />
-      <form>
+    <Box sx={{ display: "inline" }}>
+      <Box>
+        <DataGrid
+          sx={{
+            marginBottom: 5,
+            minHeight: 400,
+            maxWidth: "100%",
+            color: "white",
+          }}
+          rows={data}
+          paginationMode="server"
+          rowCount={dataLenght}
+          paginationModel={paginationModel}
+          columns={columns}
+          getRowId={(row) => row.fileName}
+          disableRowSelectionOnClick
+          onPaginationModelChange={pageChange}
+        />
+      </Box>
+      <form
+        style={{
+          display: "flex",
+          justifyContent: "center",
+        }}>
         <input
           type="file"
           multiple
