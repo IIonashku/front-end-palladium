@@ -27,6 +27,14 @@ export const MainListItems = () => {
           <ListItemText primary="Table" className={styles.Links} />
         </ListItemButton>
       </Link>
+      <Link to="/upload">
+        <ListItemButton sx={{ display: "inline-flex" }}>
+          <ListItemIcon>
+            <BackupTableIcon sx={{ margin: 2 }} />
+          </ListItemIcon>
+          <ListItemText primary="Upload table" className={styles.Links} />
+        </ListItemButton>
+      </Link>
     </React.Fragment>
   );
 };

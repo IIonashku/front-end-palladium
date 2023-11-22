@@ -16,8 +16,6 @@ import { defaultTheme } from "../themes/theme.ts";
 import { Copyright } from "@mui/icons-material";
 import { MainListItems } from "./listitems.tsx";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import TableGrid from "./CsvDataGrid.tsx";
-
 const drawerWidth: number = 240;
 
 interface AppBarProps extends MuiAppBarProps {
@@ -68,7 +66,7 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-export default function Main() {
+export default function Main({ Element }) {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -143,7 +141,7 @@ export default function Main() {
               display: "flex",
               justifyItems: "baseline",
             }}>
-            <TableGrid />
+            <Element></Element>
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>

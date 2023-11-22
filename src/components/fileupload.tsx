@@ -3,31 +3,9 @@ import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { backEndUrl } from "../config.ts";
 import { Box } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
-const columns: GridColDef[] = [
-  { field: "notValid", headerName: "Not Valid", width: 110 },
-  {
-    field: "duplicateInFile",
-    headerName: "Duplicate In File",
-    width: 170,
-  },
-  {
-    field: "dublicateInMongo",
-    headerName: "Duplicate In Mongo",
-    width: 170,
-  },
-  {
-    field: "data",
-    headerName: "Valid data",
-    width: 110,
-  },
-  {
-    field: "fileName",
-    headerName: "Uploaded file",
-    width: 310,
-  },
-];
+export let dataForUpload: any = [];
+export let dataForUploadLenght = 0;
 
 export default function UploadForm() {
   const [files, setFiles] = useState<FileList | []>([]);
@@ -38,15 +16,6 @@ export default function UploadForm() {
       setFiles(files);
     }
   };
-
-  const [data, setData] = React.useState([]);
-  const [dataLenght, setDataLenght] = React.useState(0);
-  const [paginationModel, setPaginationModel] = React.useState({
-    page: 0,
-    pageSize: 10,
-  });
-
-  const pageChange = (pageInfo) => {};
 
   const handleUpload = async () => {
     const formData = new FormData();
@@ -73,8 +42,8 @@ export default function UploadForm() {
           };
           analisys.push(newData);
         });
-        setData(analisys);
-        setDataLenght(analisys.length);
+        dataForUpload = analisys;
+        dataForUploadLenght = analisys.length;
       })
       .catch((e) => {
         console.log(e);
@@ -83,24 +52,7 @@ export default function UploadForm() {
 
   return (
     <Box sx={{ display: "inline" }}>
-      <Box>
-        <DataGrid
-          sx={{
-            marginBottom: 5,
-            minHeight: 400,
-            maxWidth: "100%",
-            color: "white",
-          }}
-          rows={data}
-          paginationMode="server"
-          rowCount={dataLenght}
-          paginationModel={paginationModel}
-          columns={columns}
-          getRowId={(row) => row.fileName}
-          disableRowSelectionOnClick
-          onPaginationModelChange={pageChange}
-        />
-      </Box>
+      <Box></Box>
       <form
         style={{
           display: "flex",

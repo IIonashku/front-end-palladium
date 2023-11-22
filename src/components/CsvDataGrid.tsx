@@ -291,7 +291,7 @@ export default function TableGrid() {
           </Button>
         </Box>
       </Box>
-      <Box sx={{ height: 870 }}>
+      <Box sx={{ height: 770 }}>
         <DataGrid
           rows={data}
           paginationMode="server"
