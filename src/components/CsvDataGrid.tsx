@@ -177,7 +177,7 @@ export default function TableGrid() {
       .post(
         backEndUrl + "/csv/data/",
         {
-          options: { skips: 0, limits: 0 },
+          options: { skips: 0, limits: 1_000_000 },
           filters: filters,
         },
         {
@@ -201,9 +201,16 @@ export default function TableGrid() {
       phoneNumber: pnFilter,
       carrier: cFilter,
     };
-    setTimeout(() => {
-      refreshPage();
-    }, 1000);
+    refreshPage();
+  };
+
+  const hanldeReset = () => {
+    filters = {
+      listTag: "",
+      phoneNumber: "",
+      carrier: "",
+    };
+    refreshPage();
   };
 
   return (
@@ -245,8 +252,25 @@ export default function TableGrid() {
             variant="contained"
             fullWidth
             onClick={handleApply}
-            style={{ backgroundColor: "#1565c0", margin: 25, maxWidth: "75%" }}>
-            Apply
+            style={{
+              backgroundColor: "#1565c0",
+              margin: 25,
+              marginBottom: 0,
+              maxWidth: "75%",
+            }}>
+            Apply filters
+          </Button>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={hanldeReset}
+            style={{
+              backgroundColor: "#1565c0",
+              margin: 25,
+              marginTop: 10,
+              maxWidth: "75%",
+            }}>
+            Reset filters
           </Button>
         </Box>
       </Box>
