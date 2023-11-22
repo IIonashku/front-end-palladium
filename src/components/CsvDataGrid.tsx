@@ -74,6 +74,9 @@ export default function TableGrid() {
   const [openOverlay, setOpenOverlay] = React.useState(0);
   const [start, setStart] = React.useState(true);
   const [exportData, setExportData] = React.useState([]);
+  const [listTag, setListTag] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
+  const [carrier, setCarier] = React.useState("");
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -210,6 +213,11 @@ export default function TableGrid() {
       phoneNumber: "",
       carrier: "",
     };
+
+    setListTag("");
+    setPhoneNumber("");
+    setCarier("");
+
     refreshPage();
   };
 
@@ -228,7 +236,10 @@ export default function TableGrid() {
             <Typography>List tag</Typography>
             <Input
               id="listTag"
+              name="listTag"
+              value={listTag}
               onChange={async (e) => {
+                setListTag(e.target.value);
                 ltFilter = e.target.value;
               }}></Input>
           </Box>
@@ -236,7 +247,10 @@ export default function TableGrid() {
             <Typography>Phone number</Typography>
             <Input
               id="phoneNumber"
+              name="phoneNumber"
+              value={phoneNumber}
               onChange={async (e) => {
+                setPhoneNumber(e.target.value);
                 pnFilter = e.target.value;
               }}></Input>
           </Box>
@@ -244,7 +258,10 @@ export default function TableGrid() {
             <Typography>Carrier</Typography>
             <Input
               id="carrier"
+              name="carrier"
+              value={carrier}
               onChange={(e) => {
+                setCarier(e.target.value);
                 cFilter = e.target.value;
               }}></Input>
           </Box>
