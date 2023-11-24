@@ -16,6 +16,7 @@ import { defaultTheme } from "../themes/theme.ts";
 import { Copyright } from "@mui/icons-material";
 import { MainListItems } from "./listitems.tsx";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+
 const drawerWidth: number = 240;
 
 interface AppBarProps extends MuiAppBarProps {

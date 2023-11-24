@@ -4,7 +4,6 @@ import axios from "axios";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { backEndUrl } from "../config.ts";
 import { Backdrop, Button, Input, Typography } from "@mui/material";
-import UploadForm from "./fileupload.tsx";
 import { CSVLink } from "react-csv";
 
 type tableData = {
@@ -166,10 +165,6 @@ export default function TableGrid() {
     setOpenOverlay(0);
   };
 
-  const handleOpenUpload = () => {
-    setOpenOverlay(1);
-  };
-
   if (data.length === 0 && start) {
     setStart(false);
     refreshPage();
@@ -312,23 +307,13 @@ export default function TableGrid() {
             width: "100%",
           }}>
           <Button
-            type="submit"
-            variant="contained"
-            id="upload"
-            style={{ backgroundColor: "#1565c0" }}
-            sx={{ mt: 2, mb: 2, maxWidth: "45%" }}
-            fullWidth
-            onClick={handleOpenUpload}>
-            Upload
-          </Button>
-          <Button
             type="button"
             variant="contained"
             id="export"
             style={{ backgroundColor: "#1565c0" }}
             fullWidth
             onClick={handleExport}
-            sx={{ mt: 2, mb: 2, maxWidth: " 45%" }}>
+            sx={{ mt: 2, mb: 2, maxWidth: " 100%" }}>
             Export to file
           </Button>
           <Backdrop
@@ -345,14 +330,6 @@ export default function TableGrid() {
                 Download
               </Button>
             </CSVLink>
-          </Backdrop>
-          <Backdrop
-            sx={{
-              zIndex: (theme) => theme.zIndex.drawer + 1,
-            }}
-            open={openOverlay === 1}
-            onDoubleClick={handleClose}>
-            <UploadForm></UploadForm>
           </Backdrop>
         </Box>
       </Box>
