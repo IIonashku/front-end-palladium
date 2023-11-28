@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import {
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   LinearProgress,
   LinearProgressProps,
   Typography,
@@ -13,19 +15,19 @@ import { backEndUrl } from "../config.ts";
 import "react-toastify/dist/ReactToastify.css";
 
 const columns: GridColDef[] = [
-  { field: "notValid", headerName: "Not Valid", width: 110 },
+  { field: "badDataCounter", headerName: "Not Valid", width: 110 },
   {
     field: "duplicateInFile",
     headerName: "Duplicate In File",
     width: 170,
   },
   {
-    field: "dublicateInMongo",
+    field: "duplicateInMongo",
     headerName: "Duplicate In Mongo",
     width: 170,
   },
   {
-    field: "data",
+    field: "validDataCounter",
     headerName: "Valid data",
     width: 110,
   },
@@ -36,27 +38,89 @@ const columns: GridColDef[] = [
   },
 ];
 
+const successfylToast = () => {
+  toast.success("File uploaded", {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    rtl: false,
+    draggable: true,
+  });
+};
+
+const errorToast = (e) => {
+  toast.error(e, {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    rtl: false,
+    draggable: true,
+  });
+};
+
 export default function Upload() {
   const [status, setStatus] = React.useState<string>();
   const [loading, setLoading] = React.useState(false);
   const [dataForUpload, setDataForUpload] = React.useState([]);
   const [dataForUploadLenght, setDataForUploadLenght] = React.useState(0);
+  const [update, setUpdate] = React.useState(false);
+  const [start, setStart] = React.useState(true);
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 10,
   });
 
   const pageChange = (pageInfo) => {
+    setLoading(true);
     setPaginationModel(pageInfo);
+    axios
+      .post(
+        backEndUrl + "/csv/analisys/data",
+        {
+          options: {
+            skips: pageInfo.page * pageInfo.pageSize,
+            limits: pageInfo.pageSize,
+          },
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.access_token,
+          },
+        }
+      )
+      .then((res) => {
+        setDataForUpload(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios
+      .post(
+        backEndUrl + "/csv/analisys/count",
+        {},
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.access_token,
+          },
+        }
+      )
+      .then((res) => {
+        setLoading(false);
+        setDataForUploadLenght(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
+
+  if (start) {
+    setStart(false);
+    pageChange(paginationModel);
+  }
 
   const [files, setFiles] = React.useState<FileList | []>([]);
-
-  const checkIsReading = () => {
-    axios.get(backEndUrl + "/csv/check/reading").then((res) => {
-      console.log(res.data);
-    });
-  };
 
   const handleFileSelection = (event: React.FormEvent) => {
     const files = (event.target as HTMLInputElement).files;
@@ -71,46 +135,48 @@ export default function Upload() {
       formData.append("files", files[i]);
     }
     setStatus("Reading");
-    axios
-      .post(backEndUrl + "/csv/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: "Bearer " + localStorage.access_token,
-        },
-      })
-      .then((res) => {
-        setLoading(true);
-        const result: [] = res.data.result;
-        const analisys: any = [];
-        result.forEach((analis: any) => {
-          const newData = {
-            notValid: analis[0].notValid,
-            duplicateInFile: analis[0].duplicateInFile,
-            dublicateInMongo: analis[0].dublicateInMongo,
-            data: analis[0].data,
-            fileName: analis[1],
-          };
-          analisys.push(newData);
+    if (update)
+      axios
+        .post(backEndUrl + "/csv/update", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.access_token,
+          },
+        })
+        .then((res) => {
+          pageChange(paginationModel);
+          setStatus("Readed and uploaded");
+          setProgress(100);
+          successfylToast();
+        })
+        .catch((e) => {
+          console.log(e);
+          setStatus("ERROR");
+          errorToast(e);
+          console.log(e);
         });
-        setDataForUpload(analisys);
-        setDataForUploadLenght(analisys.length);
-        setStatus("Readed and uploaded");
-        setLoading(false);
-        toast.success("File uploaded", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          rtl: false,
-          draggable: true,
+    else {
+      axios
+        .post(backEndUrl + "/csv/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.access_token,
+          },
+        })
+        .then((res) => {
+          pageChange(paginationModel);
+          setStatus("Readed and uploaded");
+          setProgress(100);
+          successfylToast();
+        })
+        .catch((e) => {
+          console.log(e);
+          setStatus("ERROR");
+          errorToast(e);
+          console.log(e);
         });
-      })
-      .catch((e) => {
-        setStatus("ERROR");
-        console.log(e);
-      });
+    }
   };
-
   const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
@@ -156,6 +222,7 @@ export default function Upload() {
           <Typography style={{ paddingRight: 50 }}>
             Status of uploading: {status}
           </Typography>
+
           <input
             type="file"
             multiple
@@ -170,6 +237,14 @@ export default function Upload() {
             Upload
           </Button>
         </form>
+        <FormControlLabel
+          sx={{ display: "flex", justifyContent: "center" }}
+          control={
+            <Checkbox value={update} onChange={(e) => setUpdate(!update)} />
+          }
+          label="Update"
+        />
+
         <LinearProgressWithLabel sx={{ marginTop: 10 }} value={progress} />
       </Box>
     </div>
