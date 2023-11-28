@@ -97,7 +97,7 @@ export default function Main({ Element }) {
               Csv
             </Typography>
             <IconButton color="secondary">
-              <Badge badgeContent={0} color="default">
+              <Badge badgeContent={0} style={{ color: "white" }}>
                 <NotificationsIcon />
               </Badge>
             </IconButton>

@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import axios from "axios";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { backEndUrl } from "../config.ts";
-import { Backdrop, Button, Input, Typography } from "@mui/material";
+import { Backdrop, Button, Input } from "@mui/material";
 import { CSVLink } from "react-csv";
 
 type tableData = {
@@ -63,6 +63,8 @@ const columns: GridColDef[] = [
 let ltFilter;
 let cFilter;
 let pnFilter;
+
+let pageNumber;
 
 let filters: filter;
 
@@ -228,10 +230,10 @@ export default function TableGrid() {
         }}>
         <Box>
           <Box sx={{ margin: 3 }}>
-            <Typography>List tag</Typography>
             <Input
               id="listTag"
               name="listTag"
+              placeholder="Input tag"
               value={listTag}
               onChange={async (e) => {
                 setListTag(e.target.value);
@@ -239,10 +241,10 @@ export default function TableGrid() {
               }}></Input>
           </Box>
           <Box sx={{ margin: 3 }}>
-            <Typography>Phone number</Typography>
             <Input
               id="phoneNumber"
               name="phoneNumber"
+              placeholder="Input phone number"
               value={phoneNumber}
               onChange={async (e) => {
                 setPhoneNumber(e.target.value);
@@ -250,10 +252,10 @@ export default function TableGrid() {
               }}></Input>
           </Box>
           <Box sx={{ margin: 3 }}>
-            <Typography>Carrier</Typography>
             <Input
               id="carrier"
               name="carrier"
+              placeholder="Input carrier"
               value={carrier}
               onChange={(e) => {
                 setCarier(e.target.value);
@@ -284,6 +286,29 @@ export default function TableGrid() {
             }}>
             Reset filters
           </Button>
+          <Box sx={{ margin: 3 }}>
+            <Input
+              type="number"
+              placeholder="Input page number…"
+              value={pageNumber}
+              onChange={(e) => {
+                if (
+                  Number(e.target.value) >= 0 &&
+                  Number(e.target.value) * paginationModel.pageSize <=
+                    dataLenght
+                ) {
+                  setPaginationModel({
+                    page: Number(e.target.value),
+                    pageSize: paginationModel.pageSize,
+                  });
+                  pageChange({
+                    page: e.target.value,
+                    pageSize: paginationModel.pageSize,
+                  });
+                }
+              }}
+            />
+          </Box>
         </Box>
       </Box>
       <Box sx={{ height: 770 }}>

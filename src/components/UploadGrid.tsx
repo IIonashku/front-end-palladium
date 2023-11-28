@@ -118,6 +118,13 @@ export default function Upload() {
   if (start) {
     setStart(false);
     pageChange(paginationModel);
+    axios.get(backEndUrl + "/csv/check/reading").then((res) => {
+      console.log(res.data);
+      setStatus(res.data.status);
+      if (res.data.uploadedData !== 0 && res.data.lines !== 0)
+        setProgress((res.data.uploadedData / res.data.lines) * 100);
+      else setProgress(0);
+    });
   }
 
   const [files, setFiles] = React.useState<FileList | []>([]);
@@ -183,9 +190,10 @@ export default function Upload() {
     const timer = setInterval(() => {
       if (status === "Reading")
         axios.get(backEndUrl + "/csv/check/reading").then((res) => {
+          console.log(res.data);
           setStatus(res.data.status);
-          if (res.data.uploadedData !== 0)
-            setProgress((res.data.uploadedData / res.data.fileSize) * 4000);
+          if (res.data.uploadedData !== 0 && res.data.lines !== 0)
+            setProgress((res.data.uploadedData / res.data.lines) * 100);
           else setProgress(0);
         });
     }, 5000);
