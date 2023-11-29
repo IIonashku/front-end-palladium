@@ -25,6 +25,7 @@ const header = [
   { label: "Phone number", key: "phoneNumber" },
   { label: "First name", key: "firstName" },
   { label: "Last name", key: "lastName" },
+  { label: "Type", key: "type" },
   { label: "Carrier", key: "carrier" },
   { label: "List tag", key: "listTag" },
 ];
@@ -44,6 +45,11 @@ const columns: GridColDef[] = [
   {
     field: "lastName",
     headerName: "Last name",
+    width: 110,
+  },
+  {
+    field: "type",
+    headerName: "Type",
     width: 110,
   },
   {
