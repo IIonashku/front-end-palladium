@@ -38,8 +38,8 @@ const columns: GridColDef[] = [
   },
 ];
 
-const successfylToast = () => {
-  toast.success("File uploaded", {
+const successfylToast = (message = "File uploaded") => {
+  toast.success(message, {
     position: "top-right",
     autoClose: 5000,
     hideProgressBar: false,
@@ -119,7 +119,6 @@ export default function Upload() {
     setStart(false);
     pageChange(paginationModel);
     axios.get(backEndUrl + "/csv/check/reading").then((res) => {
-      console.log(res.data);
       setStatus(res.data.status);
       if (res.data.uploadedData !== 0 && res.data.lines !== 0)
         setProgress((res.data.uploadedData / res.data.lines) * 100);
@@ -151,16 +150,22 @@ export default function Upload() {
           },
         })
         .then((res) => {
+          for (let i = 0; i < res.data.result.length; i++) {
+            if (res.data.result[i].error) {
+              successfylToast(
+                "Duplicate in on of the files" +
+                  `\n file ${res.data.result[i].message} is exist`
+              );
+            }
+          }
           pageChange(paginationModel);
           setStatus("Readed and uploaded");
           setProgress(100);
           successfylToast();
         })
         .catch((e) => {
-          console.log(e);
           setStatus("ERROR");
           errorToast(e);
-          console.log(e);
         });
     else {
       axios
@@ -171,16 +176,22 @@ export default function Upload() {
           },
         })
         .then((res) => {
+          for (let i = 0; i < res.data.result.length; i++) {
+            if (res.data.result[i].error) {
+              errorToast(
+                "Duplicate in on of the files" +
+                  `\n file ${res.data.result[i].message} is exist`
+              );
+            }
+          }
           pageChange(paginationModel);
           setStatus("Readed and uploaded");
           setProgress(100);
           successfylToast();
         })
         .catch((e) => {
-          console.log(e);
           setStatus("ERROR");
           errorToast(e);
-          console.log(e);
         });
     }
   };
@@ -190,7 +201,6 @@ export default function Upload() {
     const timer = setInterval(() => {
       if (status === "Reading")
         axios.get(backEndUrl + "/csv/check/reading").then((res) => {
-          console.log(res.data);
           setStatus(res.data.status);
           if (res.data.uploadedData !== 0 && res.data.lines !== 0)
             setProgress((res.data.uploadedData / res.data.lines) * 100);
