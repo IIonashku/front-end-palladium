@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 import { Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const successfylToast = () => {
-  toast.success("File uploaded", {
+const successfylToast = (message = "Deleted succesfully") => {
+  toast.success(message, {
     position: "top-right",
     autoClose: 5000,
     hideProgressBar: false,
@@ -60,6 +60,9 @@ export default function TagList() {
       .then((res) => {
         setStart(!start);
         console.log(res.data);
+        successfylToast(
+          `File ${fileName}, deleted successfylly and deled also ${res.data.deletedData} of csvs data`
+        );
       })
       .catch((e) => {
         console.log(e);
@@ -67,28 +70,43 @@ export default function TagList() {
   };
 
   return (
-    <div style={{ display: "table-row" }}>
+    <div style={{ display: "table-row", minWidth: "100%" }}>
       {listTag.map((tag) => {
         return (
           <div
             style={{
-              display: "inline-block",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
               border: "2px solid rgba(184, 0, 0, 0.3)",
               borderRadius: "4px",
-              width: "100%",
-              background: "rgba(235, 150, 148, 5)",
+              minWidth: "100%",
+              background: "#ffc9ca",
               paddingLeft: 10,
               marginBottom: 5,
             }}>
-            <li
-              key={tag.fileName}
+            <div
               style={{
-                fontWeight: 600,
+                display: "grid",
+                alignItems: "center",
                 width: 500,
-                display: "inline-block",
+                marginRight: 10,
               }}>
-              {tag.fileName}: {tag.validDataCounter}
-            </li>
+              {tag.fileName}
+            </div>
+            <div
+              style={{
+                background: "#1273de",
+                display: "grid",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 40,
+                minWidth: 70,
+                borderRadius: "7px",
+                color: "white",
+              }}>
+              {tag.validDataCounter}
+            </div>
             <Button
               style={{
                 display: "inline-block",

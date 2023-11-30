@@ -214,7 +214,13 @@ export default function Upload() {
   });
 
   return (
-    <div style={{ display: "block", justifyContent: "center", width: "100%" }}>
+    <div
+      style={{
+        display: "block",
+        justifyContent: "center",
+        minWidth: "100%",
+        maxWidth: "130%",
+      }}>
       <DataGrid
         sx={{
           marginBottom: 5,

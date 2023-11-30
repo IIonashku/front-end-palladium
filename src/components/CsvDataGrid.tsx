@@ -36,7 +36,7 @@ const csvReport = {
 };
 
 const columns: GridColDef[] = [
-  { field: "phoneNumber", headerName: "Phone number", width: 210 },
+  { field: "phoneNumber", headerName: "Phone number", width: 120 },
   {
     field: "firstName",
     headerName: "First name",
@@ -62,7 +62,7 @@ const columns: GridColDef[] = [
     headerName: "List tag",
     description: "This column has a big value and it unable to sort",
     sortable: false,
-    width: 300,
+    width: 390,
   },
 ];
 
@@ -317,7 +317,7 @@ export default function TableGrid() {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ height: 770 }}>
+      <Box sx={{ height: 770, minWidth: "100%" }}>
         <DataGrid
           rows={data}
           paginationMode="server"
@@ -330,6 +330,7 @@ export default function TableGrid() {
           disableRowSelectionOnClick
           onPaginationModelChange={pageChange}
           loading={isLoading}
+          style={{ minWidth: "100%" }}
         />
         <Box
           sx={{
