@@ -18,12 +18,17 @@ const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
   {
     field: "duplicateInFile",
-    headerName: "Duplicate In File",
+    headerName: "Duplicate in file",
     width: 170,
   },
   {
     field: "duplicateInMongo",
-    headerName: "Duplicate In Mongo",
+    headerName: "Duplicate in mongo",
+    width: 170,
+  },
+  {
+    field: "duplicateInBase",
+    headerName: "Duplicate in base",
     width: 170,
   },
   {

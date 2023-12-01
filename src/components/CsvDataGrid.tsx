@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import axios from "axios";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { backEndUrl } from "../config.ts";
-import { Backdrop, Button, Input } from "@mui/material";
+import { Backdrop, Button, Checkbox, Input, Typography } from "@mui/material";
 import { CSVLink } from "react-csv";
 
 type tableData = {
@@ -19,6 +19,7 @@ type filter = {
   listTag: string;
   phoneNumber: string;
   carrier: string;
+  inBase: boolean | undefined;
 };
 
 const header = [
@@ -58,6 +59,11 @@ const columns: GridColDef[] = [
     width: 210,
   },
   {
+    field: "inBase",
+    headerName: "In base",
+    width: 70,
+  },
+  {
     field: "listTag",
     headerName: "List tag",
     description: "This column has a big value and it unable to sort",
@@ -69,6 +75,7 @@ const columns: GridColDef[] = [
 let ltFilter;
 let cFilter;
 let pnFilter;
+let inBaseFilter: boolean;
 
 let pageNumber;
 
@@ -84,6 +91,7 @@ export default function TableGrid() {
   const [listTag, setListTag] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [carrier, setCarier] = React.useState("");
+  const [inBase, setInBase] = React.useState();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -206,6 +214,7 @@ export default function TableGrid() {
       listTag: ltFilter,
       phoneNumber: pnFilter,
       carrier: cFilter,
+      inBase: inBaseFilter,
     };
     refreshPage();
   };
@@ -215,11 +224,13 @@ export default function TableGrid() {
       listTag: "",
       phoneNumber: "",
       carrier: "",
+      inBase: undefined,
     };
 
     setListTag("");
     setPhoneNumber("");
     setCarier("");
+    setInBase(undefined);
 
     refreshPage();
   };
@@ -257,7 +268,7 @@ export default function TableGrid() {
                 pnFilter = e.target.value;
               }}></Input>
           </Box>
-          <Box sx={{ margin: 3 }}>
+          <Box sx={{ margin: 3, marginBottom: 0 }}>
             <Input
               id="carrier"
               name="carrier"
@@ -268,6 +279,20 @@ export default function TableGrid() {
                 cFilter = e.target.value;
               }}></Input>
           </Box>
+          <Box
+            sx={{
+              marginLeft: 3,
+              display: "flex",
+            }}>
+            <Typography
+              sx={{
+                display: "grid",
+                alignItems: "center",
+              }}>
+              inBase
+            </Typography>
+            <Checkbox onChange={() => (inBaseFilter = !inBaseFilter)} />
+          </Box>
           <Button
             variant="contained"
             fullWidth
@@ -275,6 +300,7 @@ export default function TableGrid() {
             style={{
               backgroundColor: "#1565c0",
               margin: 25,
+              marginTop: 0,
               marginBottom: 0,
               maxWidth: "75%",
             }}>

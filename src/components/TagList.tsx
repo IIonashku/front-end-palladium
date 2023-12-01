@@ -74,6 +74,7 @@ export default function TagList() {
       {listTag.map((tag) => {
         return (
           <div
+            key={tag.fileName}
             style={{
               display: "flex",
               justifyContent: "space-between",
