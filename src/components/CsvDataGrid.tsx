@@ -75,7 +75,7 @@ const columns: GridColDef[] = [
 let ltFilter;
 let cFilter;
 let pnFilter;
-let inBaseFilter: boolean;
+let inBaseFilter;
 
 let pageNumber;
 
@@ -91,11 +91,13 @@ export default function TableGrid() {
   const [listTag, setListTag] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [carrier, setCarier] = React.useState("");
-  const [inBase, setInBase] = React.useState();
+  const [inBase, setInBase] = React.useState<boolean | undefined>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
   });
+  const [nullTypeAndCarrier, setNullTypeAndCarrier] =
+    React.useState<boolean>(false);
 
   const refreshPage = async () => {
     setLoading(true);
@@ -202,6 +204,7 @@ export default function TableGrid() {
       )
       .then(async (res) => {
         setExportData(res.data);
+        console.log(res.data);
         setOpenOverlay(2);
       })
       .catch((e) => {
@@ -210,12 +213,20 @@ export default function TableGrid() {
   };
 
   const handleApply = () => {
-    filters = {
-      listTag: ltFilter,
-      phoneNumber: pnFilter,
-      carrier: cFilter,
-      inBase: inBaseFilter,
-    };
+    if (nullTypeAndCarrier) {
+      filters = {
+        listTag: ltFilter,
+        phoneNumber: pnFilter,
+        carrier: "nullTypeAndCarrier",
+        inBase: inBaseFilter,
+      };
+    } else
+      filters = {
+        listTag: ltFilter,
+        phoneNumber: pnFilter,
+        carrier: cFilter,
+        inBase: inBaseFilter,
+      };
     refreshPage();
   };
 
@@ -226,7 +237,7 @@ export default function TableGrid() {
       carrier: "",
       inBase: undefined,
     };
-
+    inBaseFilter = undefined;
     setListTag("");
     setPhoneNumber("");
     setCarier("");
@@ -278,6 +289,26 @@ export default function TableGrid() {
                 setCarier(e.target.value);
                 cFilter = e.target.value;
               }}></Input>
+          </Box>{" "}
+          <Box
+            sx={{
+              marginLeft: 3,
+              marginRight: 3,
+              display: "flex",
+            }}>
+            <Typography
+              sx={{
+                display: "grid",
+                alignItems: "center",
+              }}>
+              Null carrier and type
+            </Typography>
+            <Checkbox
+              onChange={(e) => {
+                cFilter = "";
+                setNullTypeAndCarrier(true);
+              }}
+            />
           </Box>
           <Box
             sx={{
@@ -291,7 +322,13 @@ export default function TableGrid() {
               }}>
               inBase
             </Typography>
-            <Checkbox onChange={() => (inBaseFilter = !inBaseFilter)} />
+            <Checkbox
+              sx={{ marginLeft: 7.5 }}
+              onChange={(e) => {
+                inBaseFilter = !inBase;
+                setInBase(!inBase);
+              }}
+            />
           </Box>
           <Button
             variant="contained"
