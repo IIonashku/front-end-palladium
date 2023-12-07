@@ -5,6 +5,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { backEndUrl } from "../config.ts";
 import { Backdrop, Button, Checkbox, Input, Typography } from "@mui/material";
 import { CSVLink } from "react-csv";
+import { errorToast } from "../functions/toast.message.ts";
 
 type tableData = {
   _id: string;
@@ -72,14 +73,19 @@ const columns: GridColDef[] = [
   },
 ];
 
-let ltFilter;
-let cFilter;
-let pnFilter;
+let ltFilter = "";
+let cFilter = "";
+let pnFilter = "";
 let inBaseFilter;
 
 let pageNumber;
 
-let filters: filter;
+let filters: filter = {
+  listTag: "",
+  phoneNumber: "",
+  carrier: "",
+  inBase: undefined,
+};
 
 export default function TableGrid() {
   const [dataLenght, setDataLenght] = React.useState(100);
@@ -98,6 +104,8 @@ export default function TableGrid() {
   });
   const [nullTypeAndCarrier, setNullTypeAndCarrier] =
     React.useState<boolean>(false);
+  const [countToUpdate, setCountToUpdate] = React.useState(0);
+  const [dataToUpgrade, setDataToUpdate] = React.useState<string[]>([]);
 
   const refreshPage = async () => {
     setLoading(true);
@@ -185,6 +193,12 @@ export default function TableGrid() {
 
   if (data.length === 0 && start) {
     setStart(false);
+    filters = {
+      phoneNumber: "",
+      carrier: "",
+      listTag: "",
+      inBase: undefined,
+    };
     refreshPage();
   }
 
@@ -204,7 +218,6 @@ export default function TableGrid() {
       )
       .then(async (res) => {
         setExportData(res.data);
-        console.log(res.data);
         setOpenOverlay(2);
       })
       .catch((e) => {
@@ -244,6 +257,81 @@ export default function TableGrid() {
     setInBase(undefined);
 
     refreshPage();
+  };
+
+  function handleUpdateCarrier(): void {
+    axios
+      .post(
+        backEndUrl + "/csv/count",
+        {
+          filters: {
+            phoneNumber: filters.phoneNumber,
+            listTag: filters.listTag,
+            carrier: "nullTypeAndCarrier",
+            inBase: filters.inBase,
+          },
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.access_token,
+          },
+        }
+      )
+      .then((res) => {
+        setCountToUpdate(res.data);
+        setOpenOverlay(1);
+      })
+      .catch((e) => {
+        errorToast(e.message);
+      });
+  }
+
+  const handleConfirmUpdate = async () => {
+    const phoneArray: string[] = [];
+
+    await axios
+      .post(
+        backEndUrl + "/csv/data",
+        {
+          options: { limits: 0, skips: 0 },
+          filters: {
+            phoneNumber: filters.phoneNumber,
+            listTag: filters.listTag,
+            carrier: "nullTypeAndCarrier",
+            inBase: filters.inBase,
+          },
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.access_token,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res.data);
+        for (let i = 0; i < res.data.length; i++) {
+          phoneArray.push(res.data[i].phoneNumber);
+        }
+      })
+      .catch((e) => {
+        errorToast(e.message);
+      });
+    console.log(phoneArray);
+    axios
+      .post(
+        backEndUrl + "/csv/check/carrier",
+        {
+          phoneNumber: phoneArray,
+        },
+        { headers: { Authorization: "Bearer " + localStorage.access_token } }
+      )
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log(e);
+        errorToast(e.message);
+      });
   };
 
   return (
@@ -289,24 +377,27 @@ export default function TableGrid() {
                 setCarier(e.target.value);
                 cFilter = e.target.value;
               }}></Input>
-          </Box>{" "}
-          <Box
-            sx={{
-              marginLeft: 3,
-              marginRight: 3,
-              display: "flex",
-            }}>
-            <Typography
-              sx={{
-                display: "grid",
-                alignItems: "center",
-              }}>
-              Null carrier and type
-            </Typography>
-            <Checkbox
+          </Box>
+          <Box sx={{ margin: 3, marginBottom: 0 }}>
+            <Input
+              type="number"
+              placeholder="Input page number…"
+              value={pageNumber}
               onChange={(e) => {
-                cFilter = "";
-                setNullTypeAndCarrier(true);
+                if (
+                  Number(e.target.value) >= 0 &&
+                  Number(e.target.value) * paginationModel.pageSize <=
+                    dataLenght
+                ) {
+                  setPaginationModel({
+                    page: Number(e.target.value),
+                    pageSize: paginationModel.pageSize,
+                  });
+                  pageChange({
+                    page: e.target.value,
+                    pageSize: paginationModel.pageSize,
+                  });
+                }
               }}
             />
           </Box>
@@ -355,29 +446,108 @@ export default function TableGrid() {
             }}>
             Reset filters
           </Button>
-          <Box sx={{ margin: 3 }}>
-            <Input
-              type="number"
-              placeholder="Input page number…"
-              value={pageNumber}
+          <Box
+            sx={{
+              marginLeft: 3,
+              marginRight: 3,
+              display: "flex",
+            }}>
+            <Typography
+              sx={{
+                display: "grid",
+                alignItems: "center",
+              }}>
+              Null carrier and type
+            </Typography>
+            <Checkbox
               onChange={(e) => {
-                if (
-                  Number(e.target.value) >= 0 &&
-                  Number(e.target.value) * paginationModel.pageSize <=
-                    dataLenght
-                ) {
-                  setPaginationModel({
-                    page: Number(e.target.value),
-                    pageSize: paginationModel.pageSize,
-                  });
-                  pageChange({
-                    page: e.target.value,
-                    pageSize: paginationModel.pageSize,
-                  });
-                }
+                cFilter = "";
+                setNullTypeAndCarrier(true);
               }}
             />
           </Box>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleUpdateCarrier}
+            style={{
+              backgroundColor: "#1565c0",
+              margin: 25,
+              marginTop: 0,
+              marginBottom: 0,
+              maxWidth: "75%",
+            }}>
+            Update null carrier
+          </Button>
+          <Backdrop
+            sx={{
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 500,
+              height: 150,
+              background: "#fffff9",
+              border: "2px solid #1565c0",
+              borderRadius: "5px",
+            }}
+            open={openOverlay === 1}
+            onDoubleClick={handleClose}>
+            <Box
+              sx={{
+                display: "flow",
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}>
+                <Typography sx={{ color: "black" }}>
+                  Number of data to update: {countToUpdate}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  height: 100,
+                  width: 500,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleClose}
+                  style={{
+                    backgroundColor: "#1565c0",
+                    margin: 25,
+                    marginTop: 0,
+                    marginBottom: 0,
+                    maxWidth: "75%",
+                    maxHeight: 40,
+                  }}>
+                  Cansel
+                </Button>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleConfirmUpdate}
+                  style={{
+                    backgroundColor: "#1565c0",
+                    margin: 25,
+                    marginTop: 0,
+                    marginBottom: 0,
+                    maxWidth: "75%",
+                    maxHeight: 40,
+                  }}>
+                  Update
+                </Button>
+              </Box>
+            </Box>
+          </Backdrop>
         </Box>
       </Box>
       <Box sx={{ height: 770, minWidth: "100%" }}>

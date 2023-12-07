@@ -1,31 +1,9 @@
 import axios from "axios";
 import React from "react";
 import { backEndUrl } from "../config.ts";
-import { toast } from "react-toastify";
 import { Button, Checkbox } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-const successfylToast = (message = "Deleted succesfully") => {
-  toast.success(message, {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    rtl: false,
-    draggable: true,
-  });
-};
-
-const errorToast = (e) => {
-  toast.error(e, {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    rtl: false,
-    draggable: true,
-  });
-};
+import { errorToast, successfylToast } from "../functions/toast.message.ts";
 
 export default function TagList() {
   const [listTag, setListTag] = React.useState<any[]>([]);
@@ -90,7 +68,6 @@ export default function TagList() {
       setSelected(hadleStartSelect);
     }
   };
-  React.useEffect(() => {}, [selected]);
 
   function hanldeDeleteAllSelected(): void {
     throw new Error("Function not implemented.");

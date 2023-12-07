@@ -1,6 +1,5 @@
 import * as React from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { toast } from "react-toastify";
 import {
   Box,
   Button,
@@ -13,6 +12,7 @@ import {
 import axios from "axios";
 import { backEndUrl } from "../config.ts";
 import "react-toastify/dist/ReactToastify.css";
+import { errorToast, successfylToast } from "../functions/toast.message.ts";
 
 const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
@@ -42,28 +42,6 @@ const columns: GridColDef[] = [
     width: 310,
   },
 ];
-
-const successfylToast = (message = "File uploaded") => {
-  toast.success(message, {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    rtl: false,
-    draggable: true,
-  });
-};
-
-const errorToast = (e) => {
-  toast.error(e, {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    rtl: false,
-    draggable: true,
-  });
-};
 
 export default function Upload() {
   const [status, setStatus] = React.useState<string>();
