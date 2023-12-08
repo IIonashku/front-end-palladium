@@ -105,7 +105,6 @@ export default function TableGrid() {
   const [nullTypeAndCarrier, setNullTypeAndCarrier] =
     React.useState<boolean>(false);
   const [countToUpdate, setCountToUpdate] = React.useState(0);
-  const [dataToUpgrade, setDataToUpdate] = React.useState<string[]>([]);
 
   const refreshPage = async () => {
     setLoading(true);
@@ -327,7 +326,12 @@ export default function TableGrid() {
         {
           phoneNumber: phoneArray,
         },
-        { headers: { Authorization: "Bearer " + localStorage.access_token } }
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.access_token,
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
       )
       .then((res) => {
         console.log(res.data);

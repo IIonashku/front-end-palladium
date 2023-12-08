@@ -16,6 +16,7 @@ import { defaultTheme } from "../themes/theme.ts";
 import { Copyright } from "@mui/icons-material";
 import { MainListItems } from "./listitems.tsx";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { Backdrop, Button } from "@mui/material";
 
 const drawerWidth: number = 240;
 
@@ -69,8 +70,14 @@ const Drawer = styled(MuiDrawer, {
 
 export default function Main({ Element }) {
   const [open, setOpen] = React.useState(true);
+  const [openNotification, setOpenNotification] = React.useState(false);
+  const [notification, setNotification] = React.useState([]);
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const handleOpenNotification = (notificationBool: boolean) => {
+    setOpenNotification(notificationBool);
   };
 
   return (
@@ -97,10 +104,29 @@ export default function Main({ Element }) {
               Csv
             </Typography>
             <IconButton color="secondary">
-              <Badge badgeContent={0} style={{ color: "white" }}>
-                <NotificationsIcon />
+              <Badge
+                badgeContent={notification.length}
+                style={{ color: "white" }}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    handleOpenNotification(!openNotification);
+                  }}>
+                  <NotificationsIcon />
+                </Button>
               </Badge>
             </IconButton>
+            <Backdrop
+              open={openNotification}
+              sx={{
+                width: "20%",
+                height: "40%",
+                left: "77.5%",
+                top: "5.5%",
+                background: "#fffff1",
+                border: "2px solid #1565c0",
+                borderRadius: "6px",
+              }}></Backdrop>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -118,7 +144,6 @@ export default function Main({ Element }) {
           <Divider />
           <MainListItems />
           <Divider />
-          {/* <SecondaryListItems /> */}
         </Drawer>
         <Box
           component="main"
