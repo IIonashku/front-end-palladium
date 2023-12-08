@@ -250,11 +250,15 @@ export default function TableGrid() {
       carrier: "",
       inBase: undefined,
     };
+    cFilter = "";
+    pnFilter = "";
+    ltFilter = "";
     inBaseFilter = undefined;
     setListTag("");
     setPhoneNumber("");
     setCarier("");
     setInBase(undefined);
+    setNullTypeAndCarrier(false);
 
     refreshPage();
   };
@@ -462,7 +466,8 @@ export default function TableGrid() {
             <Checkbox
               onChange={(e) => {
                 cFilter = "";
-                setNullTypeAndCarrier(true);
+                if (nullTypeAndCarrier === true) setNullTypeAndCarrier(false);
+                else setNullTypeAndCarrier(true);
               }}
             />
           </Box>
