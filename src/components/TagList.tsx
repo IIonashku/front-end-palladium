@@ -4,6 +4,7 @@ import { backEndUrl } from "../config.ts";
 import { Button, Checkbox } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { errorToast, successfylToast } from "../functions/toast.message.ts";
+import { notificationStrings } from "./mainPage.tsx";
 
 export default function TagList() {
   const [listTag, setListTag] = React.useState<any[]>([]);
@@ -27,6 +28,10 @@ export default function TagList() {
       .catch((e) => {
         errorToast(e);
         console.log(e);
+        notificationStrings.unshift({
+          type: "error",
+          message: "Error occured",
+        });
       });
   }
 
@@ -42,6 +47,10 @@ export default function TagList() {
         successfylToast(
           `File ${fileName}, deleted successfylly and deled also ${res.data.deletedData} of csvs data`
         );
+        notificationStrings.unshift({
+          type: "successfyl",
+          message: "Error occured",
+        });
       })
       .catch((e) => {
         console.log(e);

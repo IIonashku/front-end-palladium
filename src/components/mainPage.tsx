@@ -17,12 +17,20 @@ import { Copyright } from "@mui/icons-material";
 import { MainListItems } from "./listitems.tsx";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { Backdrop, Button } from "@mui/material";
+import { Notifications } from "./Notification.tsx";
 
 const drawerWidth: number = 240;
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
+
+export type notificationMessage = {
+  type: string;
+  message: string;
+};
+
+export const notificationStrings: notificationMessage[] = [];
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -71,7 +79,6 @@ const Drawer = styled(MuiDrawer, {
 export default function Main({ Element }) {
   const [open, setOpen] = React.useState(true);
   const [openNotification, setOpenNotification] = React.useState(false);
-  const [notification, setNotification] = React.useState([]);
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -105,7 +112,7 @@ export default function Main({ Element }) {
             </Typography>
             <IconButton color="secondary">
               <Badge
-                badgeContent={notification.length}
+                badgeContent={notificationStrings.length}
                 style={{ color: "white" }}>
                 <Button
                   variant="contained"
