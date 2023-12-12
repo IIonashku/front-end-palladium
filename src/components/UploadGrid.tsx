@@ -12,8 +12,7 @@ import {
 import axios from "axios";
 import { backEndUrl } from "../config.ts";
 import "react-toastify/dist/ReactToastify.css";
-import { errorToast, successfylToast } from "../functions/toast.message.ts";
-import { notificationStrings } from "./mainPage.tsx";
+import { errorToast, successfulToast } from "../functions/toast.message.ts";
 
 const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
@@ -140,30 +139,16 @@ export default function Upload() {
                 "Duplicate in on of the files" +
                   `\n file ${res.data.result[i].message} is exist`
               );
-              notificationStrings.unshift({
-                type: "error",
-                message:
-                  "Duplicate in on of the files" +
-                  `\n file ${res.data.result[i].message} is exist`,
-              });
             }
           }
           pageChange(paginationModel);
           setStatus("Readed and uploaded");
           setProgress(100);
-          successfylToast("All file has been readed");
-          notificationStrings.unshift({
-            type: "successfyl",
-            message: "All file has been readed",
-          });
+          successfulToast("All file has been readed");
         })
         .catch((e) => {
           setStatus("ERROR");
           errorToast(e);
-          notificationStrings.unshift({
-            type: "error",
-            message: "Error during uploading file",
-          });
         });
     else {
       axios
@@ -180,30 +165,16 @@ export default function Upload() {
                 "Duplicate in on of the files" +
                   `\n file ${res.data.result[i].message} is exist`
               );
-              notificationStrings.unshift({
-                type: "error",
-                message:
-                  "Duplicate in on of the files" +
-                  `\n file ${res.data.result[i].message} is exist`,
-              });
             }
           }
           pageChange(paginationModel);
           setStatus("Readed and uploaded");
           setProgress(100);
-          successfylToast("All file has been readed");
-          notificationStrings.unshift({
-            type: "error",
-            message: "Error during uploading file",
-          });
+          successfulToast("All file has been readed");
         })
         .catch((e) => {
           setStatus("ERROR");
           errorToast(e);
-          notificationStrings.unshift({
-            type: "error",
-            message: "Error during uploading file",
-          });
         });
     }
   };

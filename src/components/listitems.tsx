@@ -25,7 +25,7 @@ export const MainListItems = () => {
           <ListItemIcon>
             <BackupTableIcon sx={{ margin: 2 }} />
           </ListItemIcon>
-          <ListItemText primary="Table" className={styles.Links} />
+          <ListItemText primary="Data table" className={styles.Links} />
         </ListItemButton>
       </Link>
       <Link to="/upload">

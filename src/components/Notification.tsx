@@ -1,8 +1,112 @@
 import React from "react";
-import { notificationStrings } from "./mainPage";
+import { notificationMessage, notificationStrings } from "./mainPage.tsx";
+import { Box, Button, CircularProgress, Container, Stack } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 
 export function Notifications() {
-  return notificationStrings.map((message) => {
-    return message.message;
-  });
+  const [loading, setLoading] = React.useState(false);
+  const handleClear = (message: notificationMessage) => {
+    setLoading(true);
+    const index = notificationStrings.indexOf(message);
+    notificationStrings.splice(index, 1);
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  };
+  const handleClearAll = () => {
+    setLoading(true);
+    notificationStrings.splice(0, notificationStrings.length);
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  };
+  return (
+    <Box
+      sx={{
+        ...(loading && {
+          display: "flex",
+          justifyItems: "center",
+          alignItems: "center",
+        }),
+        ...(!loading && {
+          justifyContent: "flex-start",
+        }),
+        ...(notificationStrings.length === 0 && { alignItems: "center" }),
+      }}>
+      <Stack
+        direction="column"
+        alignItems="stretch"
+        spacing={0}
+        style={{ color: "black" }}
+        sx={{ ...(loading && { display: "none" }) }}>
+        <Container
+          style={{
+            width: "100%",
+            alignItems: "center",
+            display: "flex",
+          }}>
+          <h4
+            style={{ margin: 0, padding: 3, justifyContent: "space-between" }}>
+            Notifications
+          </h4>
+          <Button
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              top: 0,
+              right: 0,
+              padding: 0,
+            }}
+            style={{ width: 30 }}
+            onClick={() => handleClearAll()}>
+            <ClearIcon sx={{ fontSize: 20 }}></ClearIcon>
+          </Button>
+        </Container>
+        {notificationStrings.map((notification) => {
+          return (
+            <Container
+              sx={{
+                width: "100%",
+                alignItems: "center",
+                display: "flex",
+                padding: 0,
+                ...(notification.type === "error" && {
+                  background: "#ff6865",
+                }),
+                ...(notification.type === "successful" && {
+                  background: "#add8e6",
+                }),
+              }}>
+              <p
+                style={{
+                  display: "inline-block",
+                  marginBottom: 3,
+                  marginTop: 3,
+                  fontSize: 16,
+                  width: "100%",
+                  position: "relative",
+                }}>
+                {notification.message + "\n"}
+              </p>
+              <Button
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  top: 0,
+                  right: 0,
+                  padding: 0,
+                }}
+                style={{ width: 30 }}
+                onClick={() => handleClear(notification)}>
+                <ClearIcon sx={{ fontSize: 15 }}></ClearIcon>
+              </Button>
+            </Container>
+          );
+        })}
+      </Stack>
+      <CircularProgress
+        sx={{ ...(!loading && { display: "none", left: "50%" }) }}
+      />
+    </Box>
+  );
 }

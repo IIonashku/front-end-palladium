@@ -1,10 +1,9 @@
 import axios from "axios";
 import React from "react";
 import { backEndUrl } from "../config.ts";
-import { Button, Checkbox } from "@mui/material";
+import { Button, Checkbox, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { errorToast, successfylToast } from "../functions/toast.message.ts";
-import { notificationStrings } from "./mainPage.tsx";
+import { errorToast, successfulToast } from "../functions/toast.message.ts";
 
 export default function TagList() {
   const [listTag, setListTag] = React.useState<any[]>([]);
@@ -27,30 +26,30 @@ export default function TagList() {
       })
       .catch((e) => {
         errorToast(e);
-        console.log(e);
-        notificationStrings.unshift({
-          type: "error",
-          message: "Error occured",
-        });
       });
   }
 
   const hanldeDelete = (fileName: string): void => {
-    console.log(fileName);
     axios
       .delete(backEndUrl + `/csv/analisys/delete/${fileName}`, {
         headers: { Authorization: "Bearer " + localStorage.access_token },
       })
       .then((res) => {
+        for (let i = 0; i < listTag.length; i++) {
+          if (listTag[i].fileName === fileName) {
+            listTag.splice(i, 1);
+            const index = selected.indexOf(fileName);
+            selected.splice(index, 1);
+            console.log(listTag);
+            console.log(selected);
+            break;
+          }
+        }
         setStart(!start);
         console.log(res.data);
-        successfylToast(
-          `File ${fileName}, deleted successfylly and deled also ${res.data.deletedData} of csvs data`
+        successfulToast(
+          `File ${fileName}, deleted successfully and deled also ${res.data.deletedData} of csvs data`
         );
-        notificationStrings.unshift({
-          type: "successfyl",
-          message: "Error occured",
-        });
       })
       .catch((e) => {
         console.log(e);
@@ -79,11 +78,18 @@ export default function TagList() {
   };
 
   function hanldeDeleteAllSelected(): void {
-    throw new Error("Function not implemented.");
+    for (let i = 0; i < selected.length; i++) {
+      hanldeDelete(selected[i]);
+    }
   }
 
   return (
-    <div style={{ display: "table-row", minWidth: "100%" }}>
+    <Stack
+      direction="column"
+      justifyContent="flex-start"
+      alignItems="stretch"
+      spacing={0.4}
+      style={{ minWidth: "100%" }}>
       <div
         style={{
           display: "flex",
@@ -91,18 +97,13 @@ export default function TagList() {
           alignItems: "center",
           border: "2px solid rgba(184, 0, 0, 0.3)",
           borderRadius: "4px",
-          minWidth: "100%",
           minHeight: 51.5,
           background: "#ffc9ca",
           paddingLeft: 10,
-          marginBottom: 5,
         }}>
         <div
           style={{
-            display: "grid",
-            alignItems: "center",
             width: 500,
-            marginRight: 10,
           }}>
           Name of the file
         </div>
@@ -123,7 +124,7 @@ export default function TagList() {
           style={{
             display: "inline-block",
             paddingTop: 10,
-            ...(!(selected.length === listTag.length) && { display: "none" }),
+            ...(!(selected.length >= 1) && { display: "none" }),
           }}
           onClick={() => hanldeDeleteAllSelected()}>
           <DeleteIcon />
@@ -136,7 +137,6 @@ export default function TagList() {
           }}></Checkbox>
       </div>
       {listTag.map((tag) => {
-        tag.localSelect = true;
         return (
           <div
             key={tag.fileName}
@@ -149,7 +149,6 @@ export default function TagList() {
               minWidth: "100%",
               background: "#ffc9ca",
               paddingLeft: 10,
-              marginBottom: 5,
               minHeight: 51.5,
             }}>
             <div
@@ -157,7 +156,6 @@ export default function TagList() {
                 display: "grid",
                 alignItems: "center",
                 width: 500,
-                marginRight: 10,
               }}>
               {tag.fileName}
             </div>
@@ -193,6 +191,6 @@ export default function TagList() {
           </div>
         );
       })}
-    </div>
+    </Stack>
   );
 }

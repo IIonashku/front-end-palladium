@@ -126,14 +126,17 @@ export default function Main({ Element }) {
             <Backdrop
               open={openNotification}
               sx={{
-                width: "20%",
+                width: "25%",
                 height: "40%",
-                left: "77.5%",
+                left: "74%",
                 top: "5.5%",
                 background: "#fffff1",
                 border: "2px solid #1565c0",
                 borderRadius: "6px",
-              }}></Backdrop>
+                alignItems: "stretch",
+              }}>
+              <Notifications></Notifications>
+            </Backdrop>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>

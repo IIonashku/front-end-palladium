@@ -6,7 +6,6 @@ import { backEndUrl } from "../config.ts";
 import { Backdrop, Button, Checkbox, Input, Typography } from "@mui/material";
 import { CSVLink } from "react-csv";
 import { errorToast } from "../functions/toast.message.ts";
-import { notificationStrings } from "./mainPage.tsx";
 
 type tableData = {
   _id: string;
@@ -263,7 +262,7 @@ export default function TableGrid() {
     refreshPage();
   };
 
-  function handleUpdateCarrier(): void {
+  const handleUpdateCarrier = (): void => {
     axios
       .post(
         backEndUrl + "/csv/count",
@@ -287,12 +286,8 @@ export default function TableGrid() {
       })
       .catch((e) => {
         errorToast(e.message);
-        notificationStrings.unshift({
-          type: "error",
-          message: "Error occured",
-        });
       });
-  }
+  };
 
   const handleConfirmUpdate = async () => {
     const phoneArray: string[] = [];
@@ -323,10 +318,6 @@ export default function TableGrid() {
       })
       .catch((e) => {
         errorToast(e.message);
-        notificationStrings.unshift({
-          type: "error",
-          message: "Error occured",
-        });
       });
     console.log(phoneArray);
     axios
@@ -348,10 +339,6 @@ export default function TableGrid() {
       .catch((e) => {
         console.log(e);
         errorToast(e.message);
-        notificationStrings.unshift({
-          type: "error",
-          message: "Error occured",
-        });
       });
   };
 
