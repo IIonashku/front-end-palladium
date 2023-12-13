@@ -23,21 +23,29 @@ export function Notifications() {
   return (
     <Box
       sx={{
-        ...(loading && {
-          display: "flex",
-          justifyItems: "center",
-          alignItems: "center",
-        }),
         ...(!loading && {
           justifyContent: "flex-start",
         }),
-        ...(notificationStrings.length === 0 && { alignItems: "center" }),
+        ...(notificationStrings.length === 0 &&
+          !loading && {
+            position: "absolute",
+            left: "28%",
+            top: "45%",
+          }),
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
       }}>
       <Stack
         direction="column"
         alignItems="stretch"
         spacing={0}
-        style={{ color: "black" }}
+        style={{
+          color: "black",
+          width: "100%",
+          height: "100%",
+          overflow: "hidden",
+        }}
         sx={{ ...(loading && { display: "none" }) }}>
         <Container
           style={{
@@ -105,7 +113,12 @@ export function Notifications() {
         })}
       </Stack>
       <CircularProgress
-        sx={{ ...(!loading && { display: "none", left: "50%" }) }}
+        sx={{
+          ...(!loading && { display: "none", left: "50%" }),
+          position: "absolute",
+          left: "45%",
+          top: "45%",
+        }}
       />
     </Box>
   );

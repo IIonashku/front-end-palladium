@@ -134,6 +134,7 @@ export default function Main({ Element }) {
                 border: "2px solid #1565c0",
                 borderRadius: "6px",
                 alignItems: "stretch",
+                justifyContent: "center",
               }}>
               <Notifications></Notifications>
             </Backdrop>

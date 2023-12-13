@@ -48,6 +48,7 @@ export default function Upload() {
   const [loading, setLoading] = React.useState(false);
   const [dataForUpload, setDataForUpload] = React.useState([]);
   const [dataForUploadLenght, setDataForUploadLenght] = React.useState(0);
+  const [fileUploading, setFileUploading] = React.useState(0);
   const [update, setUpdate] = React.useState(false);
   const [start, setStart] = React.useState(true);
   const [paginationModel, setPaginationModel] = React.useState({
@@ -182,8 +183,9 @@ export default function Upload() {
 
   React.useEffect(() => {
     const timer = setInterval(() => {
-      if (status === "Reading")
-        axios.get(backEndUrl + "/csv/check/reading").then((res) => {
+      if (status !== "Uploaded" || fileUploading !== 0)
+        axios.get(backEndUrl + "/csv/check/reading").then((res: any) => {
+          setFileUploading(res.numOfFile);
           setStatus(res.data.status);
           if (res.data.uploadedData !== 0 && res.data.lines !== 0)
             setProgress((res.data.uploadedData / res.data.lines) * 100);

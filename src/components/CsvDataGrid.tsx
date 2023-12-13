@@ -3,7 +3,20 @@ import Box from "@mui/material/Box";
 import axios from "axios";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { backEndUrl } from "../config.ts";
-import { Backdrop, Button, Checkbox, Input, Typography } from "@mui/material";
+import {
+  Backdrop,
+  Button,
+  Checkbox,
+  FormControl,
+  Input,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
+  Typography,
+} from "@mui/material";
 import { CSVLink } from "react-csv";
 import { errorToast } from "../functions/toast.message.ts";
 
@@ -105,7 +118,16 @@ export default function TableGrid() {
   const [nullTypeAndCarrier, setNullTypeAndCarrier] =
     React.useState<boolean>(false);
   const [countToUpdate, setCountToUpdate] = React.useState(0);
-
+  const [displaingValues, setDisplaingValues] = React.useState<string[]>([]);
+  const options = [
+    "phoneNumber",
+    "firstName",
+    "lastName",
+    "type",
+    "carrier",
+    "base",
+    "listTag",
+  ];
   const refreshPage = async () => {
     setLoading(true);
     const toSkip = paginationModel.page * paginationModel.pageSize;
@@ -132,6 +154,7 @@ export default function TableGrid() {
         {
           options: { skips: toSkip, limits: limits },
           filters: filters,
+          displayStrings: displaingValues,
         },
         {
           headers: {
@@ -156,6 +179,7 @@ export default function TableGrid() {
         {
           options: { skips: toSkip, limits: limits },
           filters: filters,
+          displayStrings: displaingValues,
         },
         {
           headers: {
@@ -208,6 +232,7 @@ export default function TableGrid() {
         {
           options: { skips: 0, limits: 1_000_000 },
           filters: filters,
+          displayStrings: displaingValues,
         },
         {
           headers: {
@@ -303,6 +328,7 @@ export default function TableGrid() {
             carrier: "nullTypeAndCarrier",
             inBase: filters.inBase,
           },
+          displayStrings: displaingValues,
         },
         {
           headers: {
@@ -341,6 +367,14 @@ export default function TableGrid() {
         errorToast(e.message);
       });
   };
+
+  function handleChange(event: SelectChangeEvent<string[]>): void {
+    console.log(event.target.value);
+    console.log(displaingValues);
+    if (Array.isArray(event.target.value)) {
+      setDisplaingValues(event.target.value);
+    }
+  }
 
   return (
     <>
@@ -557,9 +591,33 @@ export default function TableGrid() {
               </Box>
             </Box>
           </Backdrop>
+          <Box
+            sx={{
+              display: "flex",
+              marginTop: 1,
+            }}>
+            <FormControl fullWidth>
+              <InputLabel id="mutiple-checkbox-label">
+                Display Options
+              </InputLabel>
+              <Select
+                labelId="mutiple-checkbox-label"
+                multiple
+                value={displaingValues}
+                onChange={handleChange}
+                input={<OutlinedInput label="Display Options" />}>
+                {options.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <Checkbox checked={displaingValues.indexOf(option) > -1} />
+                    <ListItemText primary={option} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Box>
       </Box>
-      <Box sx={{ height: 770, minWidth: "100%" }}>
+      <Box sx={{ maxHeight: 770, minWidth: "100%" }}>
         <DataGrid
           rows={data}
           paginationMode="server"

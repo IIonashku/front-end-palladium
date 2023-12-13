@@ -15,7 +15,7 @@ export const MainListItems = () => {
       <Link to="/user">
         <ListItemButton sx={{ display: "inline-flex" }}>
           <ListItemIcon>
-            <AccountCircleIcon sx={{ margin: 2 }} />
+            <AccountCircleIcon sx={{ margin: 2, marginLeft: 0 }} />
           </ListItemIcon>
           <ListItemText primary="User" className={styles.Links} />
         </ListItemButton>
@@ -23,7 +23,7 @@ export const MainListItems = () => {
       <Link to="/">
         <ListItemButton sx={{ display: "inline-flex" }}>
           <ListItemIcon>
-            <BackupTableIcon sx={{ margin: 2 }} />
+            <BackupTableIcon sx={{ margin: 2, marginLeft: 0 }} />
           </ListItemIcon>
           <ListItemText primary="Data table" className={styles.Links} />
         </ListItemButton>
@@ -31,7 +31,7 @@ export const MainListItems = () => {
       <Link to="/upload">
         <ListItemButton sx={{ display: "inline-flex" }}>
           <ListItemIcon>
-            <BackupTableIcon sx={{ margin: 2 }} />
+            <BackupTableIcon sx={{ margin: 2, marginLeft: 0 }} />
           </ListItemIcon>
           <ListItemText primary="Upload table" className={styles.Links} />
         </ListItemButton>
@@ -39,7 +39,7 @@ export const MainListItems = () => {
       <Link to="/tag/lists">
         <ListItemButton sx={{ display: "inline-flex" }}>
           <ListItemIcon>
-            <FormatListBulletedIcon sx={{ margin: 2 }} />
+            <FormatListBulletedIcon sx={{ margin: 2, marginLeft: 0 }} />
           </ListItemIcon>
           <ListItemText primary="List of tags" className={styles.Links} />
         </ListItemButton>

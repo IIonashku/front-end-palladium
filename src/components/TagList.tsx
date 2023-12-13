@@ -142,11 +142,15 @@ export default function TagList() {
             key={tag.fileName}
             style={{
               display: "flex",
+              flex: 1,
               justifyContent: "space-between",
               alignItems: "center",
               border: "2px solid rgba(184, 0, 0, 0.3)",
               borderRadius: "4px",
+              width: "100%",
               minWidth: "100%",
+              maxWidth: "130%",
+              boxSizing: "border-box",
               background: "#ffc9ca",
               paddingLeft: 10,
               minHeight: 51.5,
