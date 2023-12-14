@@ -51,31 +51,44 @@ const csvReport = {
 };
 
 const columns: GridColDef[] = [
-  { field: "phoneNumber", headerName: "Phone number", width: 120 },
+  {
+    field: "phoneNumber",
+    headerName: "Phone number",
+    width: 120,
+    sortable: false,
+  },
   {
     field: "firstName",
     headerName: "First name",
     width: 110,
+    sortable: false,
   },
   {
     field: "lastName",
     headerName: "Last name",
     width: 110,
+    sortable: false,
   },
   {
     field: "type",
     headerName: "Type",
     width: 110,
+    sortable: false,
   },
   {
     field: "carrier",
     headerName: "Carrier",
     width: 210,
+    sortable: false,
   },
   {
     field: "inBase",
     headerName: "In base",
     width: 70,
+    sortable: false,
+    renderCell: (params) => {
+      if (params.value !== undefined) return params.value ? "✅" : "❌";
+    },
   },
   {
     field: "listTag",
@@ -125,9 +138,28 @@ export default function TableGrid() {
     "lastName",
     "type",
     "carrier",
-    "base",
+    "inBase",
     "listTag",
   ];
+
+  const updateCarrierRef = React.useRef();
+
+  const handleClickOutside = (event) => {
+    if (
+      updateCarrierRef.current &&
+      !updateCarrierRef.current.contains(event.target)
+    ) {
+      setOpenOverlay(0);
+    }
+  };
+
+  React.useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const refreshPage = async () => {
     setLoading(true);
     const toSkip = paginationModel.page * paginationModel.pageSize;
@@ -369,8 +401,6 @@ export default function TableGrid() {
   };
 
   function handleChange(event: SelectChangeEvent<string[]>): void {
-    console.log(event.target.value);
-    console.log(displaingValues);
     if (Array.isArray(event.target.value)) {
       setDisplaingValues(event.target.value);
     }
@@ -523,6 +553,7 @@ export default function TableGrid() {
             Update null carrier
           </Button>
           <Backdrop
+            ref={updateCarrierRef}
             sx={{
               zIndex: (theme) => theme.zIndex.drawer + 1,
               position: "absolute",
@@ -572,7 +603,7 @@ export default function TableGrid() {
                     maxWidth: "75%",
                     maxHeight: 40,
                   }}>
-                  Cansel
+                  Cancel
                 </Button>
                 <Button
                   variant="contained"
@@ -595,6 +626,7 @@ export default function TableGrid() {
             sx={{
               display: "flex",
               marginTop: 1,
+              marginRight: 1,
             }}>
             <FormControl fullWidth>
               <InputLabel id="mutiple-checkbox-label">
@@ -626,8 +658,6 @@ export default function TableGrid() {
           getRowId={(row) => row._id}
           columns={columns}
           pageSizeOptions={[5, 10, 25, 50, 100]}
-          checkboxSelection
-          disableRowSelectionOnClick
           onPaginationModelChange={pageChange}
           loading={isLoading}
           style={{ minWidth: "100%" }}

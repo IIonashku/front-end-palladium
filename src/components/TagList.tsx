@@ -103,7 +103,7 @@ export default function TagList() {
         }}>
         <div
           style={{
-            width: 500,
+            width: "50%",
           }}>
           Name of the file
         </div>
@@ -159,7 +159,7 @@ export default function TagList() {
               style={{
                 display: "grid",
                 alignItems: "center",
-                width: 500,
+                width: "50%",
               }}>
               {tag.fileName}
             </div>

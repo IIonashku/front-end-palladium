@@ -79,9 +79,26 @@ const Drawer = styled(MuiDrawer, {
 export default function Main({ Element }) {
   const [open, setOpen] = React.useState(true);
   const [openNotification, setOpenNotification] = React.useState(false);
+  const notificationRef = React.useRef();
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const handleClickOutside = (event) => {
+    if (
+      notificationRef.current &&
+      !notificationRef.current.contains(event.target)
+    ) {
+      setOpenNotification(false);
+    }
+  };
+
+  React.useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleOpenNotification = (notificationBool: boolean) => {
     setOpenNotification(notificationBool);
@@ -124,12 +141,13 @@ export default function Main({ Element }) {
               </Badge>
             </IconButton>
             <Backdrop
+              ref={notificationRef}
               open={openNotification}
               sx={{
                 width: "25%",
                 height: "40%",
                 left: "74%",
-                top: "5.5%",
+                top: "1%",
                 background: "#fffff1",
                 border: "2px solid #1565c0",
                 borderRadius: "6px",

@@ -4,7 +4,7 @@ import Login from "./components/login.tsx";
 import Main from "./components/mainPage.tsx";
 import TableGrid from "./components/CsvDataGrid.tsx";
 import Upload from "./components/UploadGrid.tsx";
-import User from "./components/User.tsx";
+import { User } from "./components/User.tsx";
 import TagList from "./components/TagList.tsx";
 
 function App() {

@@ -31,9 +31,14 @@ export function Notifications() {
             position: "absolute",
             left: "28%",
             top: "45%",
+            width: "50%",
+            height: "10%",
           }),
-        width: "100%",
-        height: "100%",
+        ...(notificationStrings.length !== 0 &&
+          loading && {
+            width: "100%",
+            height: "100%",
+          }),
         overflow: "hidden",
       }}>
       <Stack
