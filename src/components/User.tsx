@@ -8,19 +8,32 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
   TextField,
-  makeStyles,
 } from "@mui/material";
-import { defaultTheme } from "../themes/theme.ts";
 import { errorToast, successfulToast } from "../functions/toast.message.ts";
 
 export function User() {
-  const [open, setOpen] = useState(false);
+  const roles = ["ADMIN", "USER"];
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [openChangePassword, setOpenChangePassword] = useState(false);
   const [createUserPassword, setCreateUserPassword] = useState("");
   const [createUserRole, setCreateUserRole] = useState("");
   const [createUserUsername, setCreateUserUsername] = useState("");
-  const [user, setUser] = useState({ username: "", role: "" });
-  const [start, setStart] = useState(true);
+  const [newUsername, setNewUsername] = useState("");
+  const [userOldPassword, setUserOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState(["", ""]);
+  const [user, setUser] = useState({
+    username: localStorage.username,
+    role: localStorage.role,
+  });
   const getUser = () => {
     axios
       .get(backEndUrl + "/user/me", {
@@ -29,21 +42,26 @@ export function User() {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setUser(res.data);
       });
   };
-  if (start) {
-    setStart(false);
-    getUser();
-  }
+  const handleClickOpenCreate = () => {
+    setOpenCreate(true);
+  };
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleClickOpenUpdate = () => {
+    setOpenUpdate(true);
+  };
+
+  const handleClickOpenChangePassword = () => {
+    setOpenChangePassword(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpenCreate(false);
+    setOpenUpdate(false);
+    setOpenChangePassword(false);
+    setUserOldPassword("");
   };
 
   const handleCreateUser = () => {
@@ -62,7 +80,6 @@ export function User() {
         }
       )
       .then((res) => {
-        console.log(res.data);
         successfulToast(res.data);
       })
       .catch((err) => {
@@ -71,25 +88,111 @@ export function User() {
       });
   };
 
+  const handleChangePassword = () => {
+    if (newPassword[0].length >= 6 && newPassword[0] !== userOldPassword) {
+      axios
+        .post(
+          backEndUrl + "/user/change/password",
+          {
+            newPassword: newPassword,
+            oldPassword: userOldPassword,
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.access_token,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data);
+          successfulToast("Password changed successfully");
+        })
+        .catch((e) => {
+          errorToast(e.message);
+        });
+    }
+  };
+
+  const handleChangeUsername = () => {
+    if (user.username !== newUsername) {
+      axios
+        .post(
+          backEndUrl + "/user/change/username",
+          {
+            newUsername: newUsername,
+            password: userOldPassword,
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.access_token,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data);
+          successfulToast("Username changed successfully");
+          getUser();
+        })
+        .catch((e) => {
+          errorToast(e.message);
+        });
+    }
+  };
+
+  function handleChooseRole(event: SelectChangeEvent<string>): void {
+    setCreateUserRole(event.target.value);
+  }
+
   return (
     <div>
-      <div>
-        <h1>Username: {user.username}</h1>
-        <p>Role: {user.role}</p>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleClickOpen}
-          sx={{ ...(user.role !== "ADMIN" && { display: "none" }) }}>
-          Create New User
-        </Button>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignContent: "center",
+          justifyContent: "space-evenly",
+        }}>
+        <div>
+          <h1>Username: {user.username}</h1>
+          <p>Role: {user.role}</p>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-evenly",
+            flexDirection: "column",
+            flexWrap: "wrap",
+          }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClickOpenCreate}
+            sx={{ ...(localStorage.role !== "ADMIN" && { display: "none" }) }}>
+            Create New User
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClickOpenUpdate}>
+            Change username
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClickOpenChangePassword}>
+            Change password
+          </Button>
+        </div>
       </div>
 
       <Dialog
-        open={open}
+        open={openCreate}
         onClose={handleClose}
         aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Create New User</DialogTitle>
+        <DialogTitle id="form-dialog-title" style={{ textAlign: "center" }}>
+          Create New User
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -104,12 +207,56 @@ export function User() {
           />
           <TextField
             margin="dense"
-            id="role"
-            label="Role"
+            id="password"
+            label="Password"
+            type="password"
+            fullWidth
+            onChange={(event) => {
+              setCreateUserPassword(event.target.value);
+            }}
+          />
+          <FormControl fullWidth sx={{ marginTop: 1 }}>
+            <InputLabel id="role-box-label">Role</InputLabel>
+            <Select
+              labelId="role-box-label"
+              defaultValue="USER"
+              input={<OutlinedInput label="Role" />}
+              onChange={handleChooseRole}>
+              {roles.map((role) => (
+                <MenuItem key={role} value={role}>
+                  <ListItemText primary={role} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleCreateUser} color="primary">
+            Create User
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openUpdate}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title" style={{ textAlign: "center" }}>
+          Update username
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="username"
+            label="New username"
             type="text"
             fullWidth
             onChange={(event) => {
-              setCreateUserRole(event.target.value);
+              setNewUsername(event.target.value);
             }}
           />
           <TextField
@@ -119,7 +266,7 @@ export function User() {
             type="password"
             fullWidth
             onChange={(event) => {
-              setCreateUserPassword(event.target.value);
+              setUserOldPassword(event.target.value);
             }}
           />
         </DialogContent>
@@ -127,8 +274,57 @@ export function User() {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleCreateUser} color="primary">
-            Create User
+          <Button onClick={handleChangeUsername} color="primary">
+            Change username
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openChangePassword}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title" style={{ textAlign: "center" }}>
+          Change password
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            id="password"
+            label="Old password"
+            type="password"
+            fullWidth
+            onChange={(event) => {
+              setUserOldPassword(event.target.value);
+            }}
+          />
+          <TextField
+            margin="dense"
+            id="password"
+            label="New password"
+            type="password"
+            fullWidth
+            onChange={(event) => {
+              setNewPassword([event.target.value, newPassword[1]]);
+            }}
+          />
+          <TextField
+            margin="dense"
+            id="password"
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            onChange={(event) => {
+              setNewPassword([newPassword[0], event.target.value]);
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleChangePassword} color="primary">
+            Change password
           </Button>
         </DialogActions>
       </Dialog>

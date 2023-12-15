@@ -9,11 +9,9 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { defaultTheme } from "../themes/theme.ts";
-import { Copyright } from "@mui/icons-material";
 import { MainListItems } from "./listitems.tsx";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { Backdrop, Button } from "@mui/material";
@@ -79,7 +77,7 @@ const Drawer = styled(MuiDrawer, {
 export default function Main({ Element }) {
   const [open, setOpen] = React.useState(true);
   const [openNotification, setOpenNotification] = React.useState(false);
-  const notificationRef = React.useRef();
+  const notificationRef = React.useRef<any>();
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -186,19 +184,7 @@ export default function Main({ Element }) {
             overflow: "auto",
           }}>
           <Toolbar />
-          <Container
-            maxWidth="lg"
-            sx={{
-              mt: 4,
-              mb: 4,
-              ml: 0,
-              mr: 0,
-              display: "flex",
-              justifyItems: "baseline",
-            }}>
-            <Element></Element>
-            <Copyright sx={{ pt: 4 }} />
-          </Container>
+          <Element></Element>
         </Box>
       </Box>
     </ThemeProvider>

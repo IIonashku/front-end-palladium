@@ -41,6 +41,9 @@ export default function Login({ setTokens }) {
         password: password,
       })
       .then((res: any) => {
+        console.log(res.data.user.role);
+        localStorage.role = res.data.user.role;
+        localStorage.username = res.data.user.username;
         if (res.data.access_token && res.data.refresh_token) {
           localStorage.access_token = res.data.access_token;
           localStorage.refresh_token = res.data.refresh_token;

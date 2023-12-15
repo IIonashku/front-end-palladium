@@ -85,11 +85,11 @@ export default function TagList() {
 
   return (
     <Stack
+      flexWrap="wrap"
       direction="column"
-      justifyContent="flex-start"
       alignItems="stretch"
       spacing={0.4}
-      style={{ minWidth: "100%" }}>
+      style={{ width: "90%", margin: 10 }}>
       <div
         style={{
           display: "flex",

@@ -95,7 +95,7 @@ const columns: GridColDef[] = [
     headerName: "List tag",
     description: "This column has a big value and it unable to sort",
     sortable: false,
-    width: 390,
+    width: 600,
   },
 ];
 
@@ -142,7 +142,7 @@ export default function TableGrid() {
     "listTag",
   ];
 
-  const updateCarrierRef = React.useRef();
+  const updateCarrierRef = React.useRef<any>();
 
   const handleClickOutside = (event) => {
     if (
@@ -407,7 +407,16 @@ export default function TableGrid() {
   }
 
   return (
-    <>
+    <div
+      style={{
+        marginTop: "0.5%",
+        marginBottom: 4,
+        marginLeft: "1%",
+        marginRight: "1%",
+        display: "flex",
+        justifyItems: "baseline",
+        width: "76%",
+      }}>
       <Box
         sx={{
           width: "100%",
@@ -695,6 +704,6 @@ export default function TableGrid() {
           </Backdrop>
         </Box>
       </Box>
-    </>
+    </div>
   );
 }
