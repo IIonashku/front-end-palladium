@@ -296,6 +296,17 @@ export default function TableGrid() {
         carrier: cFilter,
         inBase: inBaseFilter,
       };
+    if (listTag && listTag.length >= 1) {
+      axios
+        .get(backEndUrl + `/csv/analis/data/count/${listTag}`, {
+          headers: {
+            Authorization: "Bearer " + localStorage.access_token,
+          },
+        })
+        .then((res) => {
+          setDataLenght(res.data);
+        });
+    }
     refreshPage();
   };
 
@@ -369,7 +380,6 @@ export default function TableGrid() {
         }
       )
       .then((res) => {
-        console.log(res.data);
         for (let i = 0; i < res.data.length; i++) {
           phoneArray.push(res.data[i].phoneNumber);
         }
@@ -377,7 +387,6 @@ export default function TableGrid() {
       .catch((e) => {
         errorToast(e.message);
       });
-    console.log(phoneArray);
     axios
       .post(
         backEndUrl + "/csv/check/carrier",

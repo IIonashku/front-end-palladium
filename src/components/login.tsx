@@ -16,6 +16,8 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { defaultTheme } from "../themes/theme.ts";
 import { backEndUrl } from "../config.ts";
+import { errorToast } from "../functions/toast.message.ts";
+import { logout } from "../App.tsx";
 type User = {
   user: {
     _id: string;
@@ -41,7 +43,6 @@ export default function Login({ setTokens }) {
         password: password,
       })
       .then((res: any) => {
-        console.log(res.data.user.role);
         localStorage.role = res.data.user.role;
         localStorage.username = res.data.user.username;
         if (res.data.access_token && res.data.refresh_token) {
@@ -49,11 +50,13 @@ export default function Login({ setTokens }) {
           localStorage.refresh_token = res.data.refresh_token;
           setTokens[0](res.data.access_token);
           setTokens[1](res.data.refresh_token);
+          logout();
         }
         return res.data;
       })
       .catch((error) => {
         console.log(error);
+        errorToast(error.message);
       });
   };
 

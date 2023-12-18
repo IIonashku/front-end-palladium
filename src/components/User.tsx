@@ -25,7 +25,7 @@ export function User() {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openChangePassword, setOpenChangePassword] = useState(false);
   const [createUserPassword, setCreateUserPassword] = useState("");
-  const [createUserRole, setCreateUserRole] = useState("");
+  const [createUserRole, setCreateUserRole] = useState("USER");
   const [createUserUsername, setCreateUserUsername] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [userOldPassword, setUserOldPassword] = useState("");
@@ -104,7 +104,6 @@ export function User() {
           }
         )
         .then((res) => {
-          console.log(res.data);
           successfulToast("Password changed successfully");
         })
         .catch((e) => {
@@ -129,7 +128,6 @@ export function User() {
           }
         )
         .then((res) => {
-          console.log(res.data);
           successfulToast("Username changed successfully");
           getUser();
         })
@@ -152,6 +150,7 @@ export function User() {
           display: "flex",
           alignContent: "center",
           justifyContent: "space-evenly",
+          marginTop: "1%",
         }}>
         <div>
           <h1>Username: {user.username}</h1>
@@ -168,19 +167,25 @@ export function User() {
             variant="contained"
             color="primary"
             onClick={handleClickOpenCreate}
-            sx={{ ...(localStorage.role !== "ADMIN" && { display: "none" }) }}>
+            sx={{
+              ...(localStorage.role !== "ADMIN" && { display: "none" }),
+              margiTop: 3,
+              marginBottom: 3,
+            }}>
             Create New User
           </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleClickOpenUpdate}>
+            onClick={handleClickOpenUpdate}
+            sx={{ margiTop: 3, marginBottom: 3 }}>
             Change username
           </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleClickOpenChangePassword}>
+            onClick={handleClickOpenChangePassword}
+            sx={{ margiTop: 3, marginBottom: 3 }}>
             Change password
           </Button>
         </div>
@@ -249,6 +254,7 @@ export function User() {
         </DialogTitle>
         <DialogContent>
           <TextField
+            error={user.username === newUsername}
             autoFocus
             margin="dense"
             id="username"
@@ -290,7 +296,7 @@ export function User() {
         <DialogContent>
           <TextField
             margin="dense"
-            id="password"
+            id="oldPassword"
             label="Old password"
             type="password"
             fullWidth
@@ -299,8 +305,11 @@ export function User() {
             }}
           />
           <TextField
+            error={
+              newPassword[0] !== newPassword[1] && newPassword[0].length <= 6
+            }
             margin="dense"
-            id="password"
+            id="newPassword"
             label="New password"
             type="password"
             fullWidth
@@ -309,8 +318,11 @@ export function User() {
             }}
           />
           <TextField
+            error={
+              newPassword[0] !== newPassword[1] && newPassword[1].length <= 6
+            }
             margin="dense"
-            id="password"
+            id="confirPassword"
             label="Confirm Password"
             type="password"
             fullWidth

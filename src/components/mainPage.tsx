@@ -16,6 +16,9 @@ import { MainListItems } from "./listitems.tsx";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { Backdrop, Button } from "@mui/material";
 import { Notifications } from "./Notification.tsx";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { Link } from "react-router-dom";
+import { logout } from "../App.tsx";
 
 const drawerWidth: number = 240;
 
@@ -102,6 +105,10 @@ export default function Main({ Element }) {
     setOpenNotification(notificationBool);
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
@@ -137,6 +144,15 @@ export default function Main({ Element }) {
                   <NotificationsIcon />
                 </Button>
               </Badge>
+            </IconButton>
+            <IconButton color="secondary">
+              <Button
+                variant="contained"
+                onClick={() => {
+                  handleLogout();
+                }}>
+                <LogoutIcon />
+              </Button>
             </IconButton>
             <Backdrop
               ref={notificationRef}

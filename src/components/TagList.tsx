@@ -40,19 +40,17 @@ export default function TagList() {
             listTag.splice(i, 1);
             const index = selected.indexOf(fileName);
             selected.splice(index, 1);
-            console.log(listTag);
-            console.log(selected);
             break;
           }
         }
         setStart(!start);
-        console.log(res.data);
         successfulToast(
           `File ${fileName}, deleted successfully and deled also ${res.data.deletedData} of csvs data`
         );
       })
       .catch((e) => {
         console.log(e);
+        errorToast(e.message);
       });
   };
 

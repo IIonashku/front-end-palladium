@@ -78,6 +78,7 @@ export default function Upload() {
         setDataForUpload(res.data);
       })
       .catch((err) => {
+        errorToast(err.message);
         console.log(err);
       });
     axios
@@ -95,6 +96,7 @@ export default function Upload() {
         setDataForUploadLenght(res.data);
       })
       .catch((err) => {
+        errorToast(err.message);
         console.log(err);
       });
   };
