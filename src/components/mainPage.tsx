@@ -17,7 +17,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { Backdrop, Button } from "@mui/material";
 import { Notifications } from "./Notification.tsx";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Link } from "react-router-dom";
 import { logout } from "../App.tsx";
 
 const drawerWidth: number = 240;

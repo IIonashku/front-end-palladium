@@ -269,6 +269,7 @@ export default function TableGrid() {
         {
           headers: {
             Authorization: "Bearer " + localStorage.access_token,
+            "Access-Control-Allow-Origin": "*",
           },
         }
       )
