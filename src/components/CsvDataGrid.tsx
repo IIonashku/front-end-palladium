@@ -17,7 +17,6 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { CSVLink } from "react-csv";
 import { errorToast } from "../functions/toast.message.ts";
 
 type tableData = {
@@ -44,11 +43,6 @@ const header = [
   { label: "Carrier", key: "carrier" },
   { label: "List tag", key: "listTag" },
 ];
-
-const csvReport = {
-  filename: "Export_data.csv",
-  headers: header,
-};
 
 const columns: GridColDef[] = [
   {
@@ -119,7 +113,6 @@ export default function TableGrid() {
   const [data, setData] = React.useState<tableData[]>([]);
   const [openOverlay, setOpenOverlay] = React.useState(0);
   const [start, setStart] = React.useState(true);
-  const [exportData, setExportData] = React.useState([]);
   const [listTag, setListTag] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [carrier, setCarier] = React.useState("");
@@ -260,9 +253,8 @@ export default function TableGrid() {
   const handleExport = () => {
     axios
       .post(
-        backEndUrl + "/csv/data/",
+        backEndUrl + "/csv/export/",
         {
-          options: { skips: 0, limits: 1_000_000 },
           filters: filters,
           displayStrings: displaingValues,
         },
@@ -274,8 +266,7 @@ export default function TableGrid() {
         }
       )
       .then(async (res) => {
-        setExportData(res.data);
-        setOpenOverlay(2);
+        if (res.data === true) setOpenOverlay(2);
       })
       .catch((e) => {
         console.log(e);
@@ -415,6 +406,27 @@ export default function TableGrid() {
       setDisplaingValues(event.target.value);
     }
   }
+
+  const handleDownload = (): void => {
+    axios
+      .get(backEndUrl + "/csv/download", {
+        headers: {
+          Authorization: "Bearer " + localStorage.access_token,
+        },
+        responseType: "blob",
+      })
+      .then((res) => {
+        const href = URL.createObjectURL(res.data);
+        const link = document.createElement("a");
+        link.href = href;
+        link.setAttribute("download", "export.csv");
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(href);
+      });
+  };
 
   return (
     <div
@@ -703,14 +715,13 @@ export default function TableGrid() {
             }}
             open={openOverlay === 2}
             onDoubleClick={handleClose}>
-            <CSVLink data={exportData} {...csvReport}>
-              <Button
-                type="button"
-                variant="contained"
-                style={{ backgroundColor: "#1565c0", width: 400 }}>
-                Download
-              </Button>
-            </CSVLink>
+            <Button
+              type="button"
+              variant="contained"
+              onClick={handleDownload}
+              style={{ backgroundColor: "#1565c0", width: 400 }}>
+              Download
+            </Button>
           </Backdrop>
         </Box>
       </Box>
