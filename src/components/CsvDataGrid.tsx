@@ -34,16 +34,6 @@ type filter = {
   carrier: string;
   inBase: boolean | undefined;
 };
-
-const header = [
-  { label: "Phone number", key: "phoneNumber" },
-  { label: "First name", key: "firstName" },
-  { label: "Last name", key: "lastName" },
-  { label: "Type", key: "type" },
-  { label: "Carrier", key: "carrier" },
-  { label: "List tag", key: "listTag" },
-];
-
 const columns: GridColDef[] = [
   {
     field: "phoneNumber",
@@ -96,6 +86,7 @@ const columns: GridColDef[] = [
 let ltFilter = "";
 let cFilter = "";
 let pnFilter = "";
+let fileName = "";
 let inBaseFilter;
 
 let pageNumber;
@@ -116,6 +107,7 @@ export default function TableGrid() {
   const [listTag, setListTag] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [carrier, setCarier] = React.useState("");
+  const [exportFile, setExportFile] = React.useState("");
   const [inBase, setInBase] = React.useState<boolean | undefined>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -253,7 +245,7 @@ export default function TableGrid() {
   const handleExport = () => {
     axios
       .post(
-        backEndUrl + "/csv/export/",
+        backEndUrl + `/csv/export/${exportFile}`,
         {
           filters: filters,
           displayStrings: displaingValues,
@@ -409,7 +401,7 @@ export default function TableGrid() {
 
   const handleDownload = (): void => {
     axios
-      .get(backEndUrl + "/csv/download", {
+      .get(backEndUrl + `/csv/download/${exportFile}`, {
         headers: {
           Authorization: "Bearer " + localStorage.access_token,
         },
@@ -419,7 +411,7 @@ export default function TableGrid() {
         const href = URL.createObjectURL(res.data);
         const link = document.createElement("a");
         link.href = href;
-        link.setAttribute("download", "export.csv");
+        link.setAttribute("download", `${exportFile}.csv`);
         document.body.appendChild(link);
         link.click();
 
@@ -699,6 +691,13 @@ export default function TableGrid() {
             justifyContent: "space-between",
             width: "100%",
           }}>
+          <Input
+            sx={{ width: "50%" }}
+            value={exportFile}
+            onChange={(event) => {
+              const exportFileName = event.target.value;
+              setExportFile(exportFileName);
+            }}></Input>
           <Button
             type="button"
             variant="contained"
@@ -706,7 +705,7 @@ export default function TableGrid() {
             style={{ backgroundColor: "#1565c0" }}
             fullWidth
             onClick={handleExport}
-            sx={{ mt: 2, mb: 2, maxWidth: " 100%" }}>
+            sx={{ mt: 2, mb: 2, width: " 50%" }}>
             Export to file
           </Button>
           <Backdrop

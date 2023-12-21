@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import BackupTableIcon from "@mui/icons-material/BackupTable";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import styles from "./components.module.css";
 
 export const MainListItems = () => {
@@ -42,6 +43,14 @@ export const MainListItems = () => {
             <FormatListBulletedIcon sx={{ margin: 2, marginLeft: 0 }} />
           </ListItemIcon>
           <ListItemText primary="List of tags" className={styles.Links} />
+        </ListItemButton>
+      </Link>{" "}
+      <Link to="/export">
+        <ListItemButton sx={{ display: "inline-flex" }}>
+          <ListItemIcon>
+            <FileUploadIcon sx={{ margin: 2, marginLeft: 0 }} />
+          </ListItemIcon>
+          <ListItemText primary="Exports" className={styles.Links} />
         </ListItemButton>
       </Link>
     </React.Fragment>
