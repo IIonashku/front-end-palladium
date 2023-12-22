@@ -17,7 +17,7 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { errorToast } from "../functions/toast.message.ts";
+import { errorToast, successfulToast } from "../functions/toast.message.ts";
 
 type tableData = {
   _id: string;
@@ -86,7 +86,6 @@ const columns: GridColDef[] = [
 let ltFilter = "";
 let cFilter = "";
 let pnFilter = "";
-let fileName = "";
 let inBaseFilter;
 
 let pageNumber;
@@ -258,7 +257,7 @@ export default function TableGrid() {
         }
       )
       .then(async (res) => {
-        if (res.data === true) setOpenOverlay(2);
+        successfulToast("File fully created");
       })
       .catch((e) => {
         console.log(e);
@@ -398,27 +397,6 @@ export default function TableGrid() {
       setDisplaingValues(event.target.value);
     }
   }
-
-  const handleDownload = (): void => {
-    axios
-      .get(backEndUrl + `/csv/download/${exportFile}`, {
-        headers: {
-          Authorization: "Bearer " + localStorage.access_token,
-        },
-        responseType: "blob",
-      })
-      .then((res) => {
-        const href = URL.createObjectURL(res.data);
-        const link = document.createElement("a");
-        link.href = href;
-        link.setAttribute("download", `${exportFile}.csv`);
-        document.body.appendChild(link);
-        link.click();
-
-        document.body.removeChild(link);
-        URL.revokeObjectURL(href);
-      });
-  };
 
   return (
     <div
@@ -705,23 +683,9 @@ export default function TableGrid() {
             style={{ backgroundColor: "#1565c0" }}
             fullWidth
             onClick={handleExport}
-            sx={{ mt: 2, mb: 2, width: " 50%" }}>
+            sx={{ mt: 2, mb: 2, width: "50%" }}>
             Export to file
           </Button>
-          <Backdrop
-            sx={{
-              zIndex: (theme) => theme.zIndex.drawer + 1,
-            }}
-            open={openOverlay === 2}
-            onDoubleClick={handleClose}>
-            <Button
-              type="button"
-              variant="contained"
-              onClick={handleDownload}
-              style={{ backgroundColor: "#1565c0", width: 400 }}>
-              Download
-            </Button>
-          </Backdrop>
         </Box>
       </Box>
     </div>

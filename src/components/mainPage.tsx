@@ -159,7 +159,7 @@ export default function Main({ Element }) {
               sx={{
                 width: "25%",
                 height: "40%",
-                left: "74%",
+                left: "69.5%",
                 top: "1%",
                 background: "#fffff1",
                 border: "2px solid #1565c0",
