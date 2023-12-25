@@ -23,9 +23,6 @@ export function Notifications() {
   return (
     <Box
       sx={{
-        ...(!loading && {
-          justifyContent: "flex-start",
-        }),
         ...(notificationStrings.length === 0 &&
           !loading && {
             position: "absolute",
@@ -34,29 +31,25 @@ export function Notifications() {
             width: "50%",
             height: "10%",
           }),
-        ...(notificationStrings.length !== 0 &&
-          loading && {
-            width: "100%",
-            height: "100%",
-          }),
         overflow: "hidden",
+        width: "100%",
       }}>
       <Stack
         direction="column"
         alignItems="stretch"
+        justifyContent="flex-start"
         spacing={0}
         style={{
           color: "black",
           width: "100%",
           height: "100%",
-          overflow: "hidden",
         }}
         sx={{ ...(loading && { display: "none" }) }}>
         <Container
           style={{
             width: "100%",
-            alignItems: "center",
             display: "flex",
+            padding: 0,
           }}>
           <h4
             style={{ margin: 0, padding: 3, justifyContent: "space-between" }}>
@@ -65,7 +58,6 @@ export function Notifications() {
           <Button
             sx={{
               alignItems: "center",
-              justifyContent: "center",
               top: 0,
               right: 0,
               padding: 0,
@@ -80,7 +72,7 @@ export function Notifications() {
             <Container
               sx={{
                 width: "100%",
-                alignItems: "center",
+                alignItems: "stretch",
                 display: "flex",
                 padding: 0,
                 ...(notification.type === "error" && {
@@ -98,13 +90,12 @@ export function Notifications() {
                   fontSize: 16,
                   width: "100%",
                   position: "relative",
+                  padding: 0,
                 }}>
                 {notification.message + "\n"}
               </p>
               <Button
                 sx={{
-                  alignItems: "center",
-                  justifyContent: "center",
                   top: 0,
                   right: 0,
                   padding: 0,

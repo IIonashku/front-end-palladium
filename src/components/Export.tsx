@@ -83,6 +83,7 @@ export function Export() {
         console.log(err);
         errorToast("Something went wrong");
       });
+    getFiles();
   };
 
   const handleDownloadFile = (fileName: string) => {
@@ -108,6 +109,18 @@ export function Export() {
         console.log(err);
         errorToast("Something went wrong");
       });
+  };
+
+  const deleteAll = () => {
+    exportFiles.forEach((file) => {
+      handleDeleteFile(file.fileName);
+    });
+    getFiles();
+  };
+  const downloadAll = () => {
+    exportFiles.forEach((file) => {
+      handleDownloadFile(file.fileName);
+    });
   };
   return (
     <div style={{ display: "flex" }}>
@@ -146,7 +159,7 @@ export function Export() {
               color: "white",
             }}>
             Number
-          </div>{" "}
+          </div>
           <div>
             <Button
               style={{
@@ -154,7 +167,9 @@ export function Export() {
                 paddingTop: 10,
                 ...(!(exportFiles.length >= 1) && { display: "none" }),
               }}
-              onClick={() => {}}>
+              onClick={() => {
+                deleteAll();
+              }}>
               <DeleteIcon style={{ color: "crimson" }} />
             </Button>
             <Button
@@ -162,7 +177,9 @@ export function Export() {
                 display: "inline-block",
                 paddingTop: 10,
               }}
-              onClick={() => {}}>
+              onClick={() => {
+                downloadAll();
+              }}>
               <FileDownloadIcon style={{ color: "white" }} />
             </Button>
           </div>

@@ -112,7 +112,7 @@ export default function Main({ Element }) {
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
-        <AppBar position="absolute" open={open}>
+        <AppBar open={open}>
           <Toolbar>
             <IconButton
               edge="start"
@@ -165,7 +165,7 @@ export default function Main({ Element }) {
                 border: "2px solid #1565c0",
                 borderRadius: "6px",
                 alignItems: "stretch",
-                justifyContent: "center",
+                justifyContent: "start",
               }}>
               <Notifications></Notifications>
             </Backdrop>
