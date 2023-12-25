@@ -1,4 +1,4 @@
-import { Stack, Button, Typography } from "@mui/material";
+import { Stack, Button, Typography, Dialog } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
@@ -6,13 +6,21 @@ import React from "react";
 import axios from "axios";
 import { backEndUrl } from "../config.ts";
 import { errorToast, successfulToast } from "../functions/toast.message.ts";
+import InfoIcon from "@mui/icons-material/Info";
 
 export function Export() {
   const [exportFiles, setExportFiles] = React.useState<any>([]);
   const [start, setStart] = React.useState<boolean>(true);
   const [brokenCarrierLenght, setBrokenCarrierLenght] = React.useState(0);
   const [brokenLastnameLenght, setBrokenLastnameLenght] = React.useState(0);
-
+  const [info, setInfo] = React.useState(false);
+  const [fileInfo, setFileInfo] = React.useState({
+    listTag: "",
+    phoneNumber: "",
+    carrier: "",
+    fileName: "",
+    numData: 0,
+  });
   const getFiles = () => {
     axios
       .get(backEndUrl + "/csv/export/files", {
@@ -78,12 +86,12 @@ export function Export() {
       })
       .then((res) => {
         successfulToast(`File ${fileName}.csv was deleted`);
+        getFiles();
       })
       .catch((err) => {
         console.log(err);
         errorToast("Something went wrong");
       });
-    getFiles();
   };
 
   const handleDownloadFile = (fileName: string) => {
@@ -122,6 +130,18 @@ export function Export() {
       handleDownloadFile(file.fileName);
     });
   };
+
+  const openFileInfo = (file: any) => {
+    setFileInfo({
+      listTag: file.listTag,
+      phoneNumber: file.phoneNumber,
+      carrier: file.carrier,
+      fileName: file.fileName,
+      numData: file.dataCounter,
+    });
+    setInfo(true);
+  };
+
   return (
     <div style={{ display: "flex" }}>
       <Stack
@@ -171,6 +191,15 @@ export function Export() {
                 deleteAll();
               }}>
               <DeleteIcon style={{ color: "crimson" }} />
+            </Button>
+            <Button
+              style={{
+                display: "inline-block",
+                paddingTop: 10,
+              }}
+              onClick={() => {}}
+              disabled>
+              <InfoIcon style={{ color: "white" }} />
             </Button>
             <Button
               style={{
@@ -239,6 +268,16 @@ export function Export() {
                     paddingTop: 10,
                   }}
                   onClick={() => {
+                    openFileInfo(file);
+                  }}>
+                  <InfoIcon style={{ color: "white" }}></InfoIcon>
+                </Button>
+                <Button
+                  style={{
+                    display: "inline-block",
+                    paddingTop: 10,
+                  }}
+                  onClick={() => {
                     handleDownloadFile(file.fileName);
                   }}>
                   <FileDownloadIcon style={{ color: "white" }} />
@@ -248,6 +287,33 @@ export function Export() {
           );
         })}
       </Stack>
+      <Dialog open={info}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignContent: "center",
+          }}>
+          <div style={{ margin: 30 }}>
+            <Typography>fileName: {fileInfo.fileName}.csv</Typography>
+            <Typography>Data count {fileInfo.numData}</Typography>
+            <Typography>
+              List tag filter: {fileInfo.listTag ? fileInfo.listTag : "None"}
+            </Typography>
+            <Typography>
+              Phone number filter:{" "}
+              {fileInfo.phoneNumber ? fileInfo.phoneNumber : "None"}
+            </Typography>
+            <Typography>
+              Carrier filter: {fileInfo.carrier ? fileInfo.carrier : "None"}
+            </Typography>
+          </div>
+          <Button onClick={() => setInfo(false)} style={{ margin: 10 }}>
+            Close
+          </Button>
+        </div>
+      </Dialog>
       <div
         style={{
           margin: "1.5%",
