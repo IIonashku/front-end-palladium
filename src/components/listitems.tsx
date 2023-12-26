@@ -21,7 +21,7 @@ export const MainListItems = () => {
           <ListItemText primary="User" className={styles.Links} />
         </ListItemButton>
       </Link>
-      <Link to="/">
+      <Link to="/data">
         <ListItemButton sx={{ display: "inline-flex" }}>
           <ListItemIcon>
             <BackupTableIcon sx={{ margin: 2, marginLeft: 0 }} />
@@ -44,7 +44,7 @@ export const MainListItems = () => {
           </ListItemIcon>
           <ListItemText primary="List of tags" className={styles.Links} />
         </ListItemButton>
-      </Link>{" "}
+      </Link>
       <Link to="/export">
         <ListItemButton sx={{ display: "inline-flex" }}>
           <ListItemIcon>

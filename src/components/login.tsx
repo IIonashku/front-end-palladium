@@ -12,12 +12,12 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { ThemeProvider } from "@mui/material/styles";
-import PropTypes from "prop-types";
 import axios from "axios";
 import { defaultTheme } from "../themes/theme.ts";
 import { backEndUrl } from "../config.ts";
 import { errorToast } from "../functions/toast.message.ts";
-import { logout } from "../App.tsx";
+import { redirect, useNavigate } from "react-router-dom";
+
 type User = {
   user: {
     _id: string;
@@ -31,9 +31,11 @@ type User = {
 type PostLoginResponse = {
   data: User;
 };
-export default function Login({ setTokens }) {
+export default function Login() {
   const [username, setUserName] = React.useState<string | null>();
   const [password, setPassword] = React.useState<string | null>();
+
+  const navigate = useNavigate();
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,13 +47,9 @@ export default function Login({ setTokens }) {
       .then((res: any) => {
         localStorage.role = res.data.user.role;
         localStorage.username = res.data.user.username;
-        if (res.data.access_token && res.data.refresh_token) {
-          localStorage.access_token = res.data.access_token;
-          localStorage.refresh_token = res.data.refresh_token;
-          setTokens[0](res.data.access_token);
-          setTokens[1](res.data.refresh_token);
-          logout();
-        }
+        localStorage.access_token = res.data.access_token;
+        localStorage.refresh_token = res.data.refresh_token;
+        navigate("/data");
         return res.data;
       })
       .catch((error) => {
@@ -109,13 +107,15 @@ export default function Login({ setTokens }) {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2, color: "black" }}>
-              Sign In
-            </Button>
+            <Link>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2, color: "black" }}>
+                Sign In
+              </Button>
+            </Link>
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
@@ -129,7 +129,3 @@ export default function Login({ setTokens }) {
     </ThemeProvider>
   );
 }
-
-Login.propTypes = {
-  setTokens: PropTypes.array.isRequired,
-};

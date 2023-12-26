@@ -17,7 +17,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { Backdrop, Button } from "@mui/material";
 import { Notifications } from "./Notification.tsx";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { logout } from "../App.tsx";
+import { Link, useNavigate } from "react-router-dom";
 
 const drawerWidth: number = 240;
 
@@ -83,6 +83,10 @@ export default function Main({ Element }) {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const navigate = useNavigate();
+  if (!localStorage.access_token && !localStorage.refresh_token) {
+    navigate("/");
+  }
 
   const handleClickOutside = (event) => {
     if (
@@ -105,7 +109,9 @@ export default function Main({ Element }) {
   };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    navigate("/");
   };
 
   return (
@@ -145,13 +151,15 @@ export default function Main({ Element }) {
               </Badge>
             </IconButton>
             <IconButton color="secondary">
-              <Button
-                variant="contained"
-                onClick={() => {
-                  handleLogout();
-                }}>
-                <LogoutIcon />
-              </Button>
+              <Link to={"/"}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    handleLogout();
+                  }}>
+                  <LogoutIcon />
+                </Button>
+              </Link>
             </IconButton>
             <Backdrop
               ref={notificationRef}
