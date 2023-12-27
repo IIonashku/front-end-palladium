@@ -16,7 +16,8 @@ import axios from "axios";
 import { defaultTheme } from "../themes/theme.ts";
 import { backEndUrl } from "../config.ts";
 import { errorToast } from "../functions/toast.message.ts";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../axios.instance.ts";
 
 type User = {
   user: {
@@ -40,7 +41,7 @@ export default function Login() {
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await axios
-      .post<PostLoginResponse>(backEndUrl + "/auth/login", {
+      .post<PostLoginResponse>(`${backEndUrl}/auth/login`, {
         username: username,
         password: password,
       })
@@ -49,12 +50,15 @@ export default function Login() {
         localStorage.username = res.data.user.username;
         localStorage.access_token = res.data.access_token;
         localStorage.refresh_token = res.data.refresh_token;
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${localStorage.access_token}`;
         navigate("/data");
         return res.data;
       })
       .catch((error) => {
-        console.log(error);
-        errorToast(error.message);
+        console.log(error.response.data.message);
+        errorToast(error.response.data.message);
       });
   };
 

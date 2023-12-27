@@ -1,6 +1,3 @@
-import axios from "axios";
-//import React from "react";
-import { backEndUrl } from "../config.ts";
 import React, { useState } from "react";
 import {
   Button,
@@ -17,7 +14,8 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import { errorToast, successfulToast } from "../functions/toast.message.ts";
+import { successfulToast } from "../functions/toast.message.ts";
+import { axiosInstance } from "../axios.instance.ts";
 
 export function User() {
   const roles = ["ADMIN", "USER"];
@@ -35,15 +33,9 @@ export function User() {
     role: localStorage.role,
   });
   const getUser = () => {
-    axios
-      .get(backEndUrl + "/user/me", {
-        headers: {
-          Authorization: "Bearer " + localStorage.access_token,
-        },
-      })
-      .then((res) => {
-        setUser(res.data);
-      });
+    axiosInstance.get("/user/me").then((res) => {
+      setUser(res.data);
+    });
   };
   const handleClickOpenCreate = () => {
     setOpenCreate(true);
@@ -65,74 +57,43 @@ export function User() {
   };
 
   const handleCreateUser = () => {
-    axios
-      .post(
-        backEndUrl + "/auth/create",
-        {
-          username: createUserUsername,
-          password: createUserPassword,
-          role: createUserRole,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
-      .then((res) => {
-        successfulToast(res.data);
+    axiosInstance
+      .post("/auth/create", {
+        username: createUserUsername,
+        password: createUserPassword,
+        role: createUserRole,
       })
-      .catch((err) => {
-        console.log(err);
-        errorToast(err.message);
+      .then((res) => {
+        if (res == null) {
+          return;
+        }
+        successfulToast(res.data);
       });
   };
 
   const handleChangePassword = () => {
     if (newPassword[0].length >= 6 && newPassword[0] !== userOldPassword) {
-      axios
-        .post(
-          backEndUrl + "/user/change/password",
-          {
-            newPassword: newPassword,
-            oldPassword: userOldPassword,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.access_token,
-            },
-          }
-        )
+      axiosInstance
+        .post("/user/change/password", {
+          newPassword: newPassword,
+          oldPassword: userOldPassword,
+        })
         .then((res) => {
           successfulToast("Password changed successfully");
-        })
-        .catch((e) => {
-          errorToast(e.message);
         });
     }
   };
 
   const handleChangeUsername = () => {
     if (user.username !== newUsername) {
-      axios
-        .post(
-          backEndUrl + "/user/change/username",
-          {
-            newUsername: newUsername,
-            password: userOldPassword,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.access_token,
-            },
-          }
-        )
+      axiosInstance
+        .post("/user/change/username", {
+          newUsername: newUsername,
+          password: userOldPassword,
+        })
         .then((res) => {
           successfulToast("Username changed successfully");
           getUser();
-        })
-        .catch((e) => {
-          errorToast(e.message);
         });
     }
   };

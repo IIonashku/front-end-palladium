@@ -1,12 +1,10 @@
 import { Stack, Button, Typography, Dialog } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-
 import React from "react";
-import axios from "axios";
-import { backEndUrl } from "../config.ts";
-import { errorToast, successfulToast } from "../functions/toast.message.ts";
+import { successfulToast } from "../functions/toast.message.ts";
 import InfoIcon from "@mui/icons-material/Info";
+import { axiosInstance } from "../axios.instance.ts";
 
 export function Export() {
   const [exportFiles, setExportFiles] = React.useState<any>([]);
@@ -22,24 +20,22 @@ export function Export() {
     numData: 0,
   });
   const getFiles = () => {
-    axios
-      .get(backEndUrl + "/csv/export/files", {
-        headers: { Authorization: "Bearer " + localStorage.access_token },
-      })
-      .then((res) => {
-        setExportFiles(res.data);
-      });
+    axiosInstance.get("/csv/export/files").then((res) => {
+      if (res == null) {
+        return;
+      }
+      setExportFiles(res.data);
+    });
   };
 
   const brokenDataLenght = () => {
-    axios
-      .get(backEndUrl + "/csv/fix/count", {
-        headers: { Authorization: "Bearer " + localStorage.access_token },
-      })
-      .then((res) => {
-        setBrokenCarrierLenght(res.data.brokenCarrier);
-        setBrokenLastnameLenght(res.data.brokenLastname);
-      });
+    axiosInstance.get("/csv/fix/count").then((res) => {
+      if (res == null) {
+        return;
+      }
+      setBrokenCarrierLenght(res.data.brokenCarrier);
+      setBrokenLastnameLenght(res.data.brokenLastname);
+    });
   };
 
   if (start) {
@@ -48,61 +44,42 @@ export function Export() {
     brokenDataLenght();
   }
   const handleFixCarrier = () => {
-    axios
-      .get(backEndUrl + "/csv/fix/carrier", {
-        headers: {
-          Authorization: "Bearer " + localStorage.access_token,
-        },
-      })
-      .then((res) => {
-        successfulToast(`Fixed ${res.data} data's carrier`);
-      })
-      .catch((err) => {
-        console.log(err);
-        errorToast("Something went wrong");
-      });
+    axiosInstance.get("/csv/fix/carrier").then((res) => {
+      if (res == null) {
+        return;
+      }
+      successfulToast(`Fixed ${res.data} data's carrier`);
+    });
   };
 
   const handleFixLastName = () => {
-    axios
-      .get(backEndUrl + "/csv/fix/lastname", {
-        headers: {
-          Authorization: "Bearer " + localStorage.access_token,
-        },
-      })
-      .then((res) => {
-        successfulToast(`Fixed ${res.data} data's carrier`);
-      })
-      .catch((err) => {
-        errorToast("Something went wrong");
-        console.log(err);
-      });
+    axiosInstance.get("/csv/fix/lastname").then((res) => {
+      if (res == null) {
+        return;
+      }
+      successfulToast(`Fixed ${res.data} data's carrier`);
+    });
   };
 
   const handleDeleteFile = (fileName: string) => {
-    axios
-      .get(backEndUrl + `/csv/export/delete/${fileName}`, {
-        headers: { Authorization: "Bearer " + localStorage.access_token },
-      })
-      .then((res) => {
-        successfulToast(`File ${fileName}.csv was deleted`);
-        getFiles();
-      })
-      .catch((err) => {
-        console.log(err);
-        errorToast("Something went wrong");
-      });
+    axiosInstance.get(`/csv/export/delete/${fileName}`).then((res) => {
+      if (res == null) {
+        return;
+      }
+      successfulToast(`File ${fileName}.csv was deleted`);
+      getFiles();
+    });
   };
 
   const handleDownloadFile = (fileName: string) => {
-    axios
-      .get(backEndUrl + `/csv/download/${fileName}`, {
-        headers: {
-          Authorization: "Bearer " + localStorage.access_token,
-        },
+    axiosInstance
+      .get(`/csv/download/${fileName}`, {
         responseType: "blob",
       })
       .then((res) => {
+        if (res == null) {
+          return;
+        }
         const href = URL.createObjectURL(res.data);
         const link = document.createElement("a");
         link.href = href;
@@ -112,10 +89,6 @@ export function Export() {
 
         document.body.removeChild(link);
         URL.revokeObjectURL(href);
-      })
-      .catch((err) => {
-        console.log(err);
-        errorToast("Something went wrong");
       });
   };
 

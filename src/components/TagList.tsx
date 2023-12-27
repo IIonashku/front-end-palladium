@@ -1,9 +1,8 @@
-import axios from "axios";
 import React from "react";
-import { backEndUrl } from "../config.ts";
 import { Button, Checkbox, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { errorToast, successfulToast } from "../functions/toast.message.ts";
+import { successfulToast } from "../functions/toast.message.ts";
+import { axiosInstance } from "../axios.instance.ts";
 
 export default function TagList() {
   const [listTag, setListTag] = React.useState<any[]>([]);
@@ -11,47 +10,32 @@ export default function TagList() {
   const [selected, setSelected] = React.useState<string[]>([]);
   if (start) {
     setStart(!start);
-    axios
-      .post(
-        backEndUrl + "/csv/analisys/tags",
-        {},
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
-      .then((res) => {
-        setListTag(res.data);
-      })
-      .catch((e) => {
-        errorToast(e);
-      });
+    axiosInstance.post("/csv/analisys/tags", {}).then((res) => {
+      if (res == null) {
+        return;
+      }
+      setListTag(res.data);
+    });
   }
 
   const hanldeDelete = (fileName: string): void => {
-    axios
-      .delete(backEndUrl + `/csv/analisys/delete/${fileName}`, {
-        headers: { Authorization: "Bearer " + localStorage.access_token },
-      })
-      .then((res) => {
-        for (let i = 0; i < listTag.length; i++) {
-          if (listTag[i].fileName === fileName) {
-            listTag.splice(i, 1);
-            const index = selected.indexOf(fileName);
-            selected.splice(index, 1);
-            break;
-          }
+    axiosInstance.delete(`/csv/analisys/delete/${fileName}`).then((res) => {
+      if (res == null) {
+        return;
+      }
+      for (let i = 0; i < listTag.length; i++) {
+        if (listTag[i].fileName === fileName) {
+          listTag.splice(i, 1);
+          const index = selected.indexOf(fileName);
+          selected.splice(index, 1);
+          break;
         }
-        setStart(!start);
-        successfulToast(
-          `File ${fileName}, deleted successfully and deled also ${res.data.deletedData} of csvs data`
-        );
-      })
-      .catch((e) => {
-        console.log(e);
-        errorToast(e.message);
-      });
+      }
+      setStart(!start);
+      successfulToast(
+        `File ${fileName}, deleted successfully and deled also ${res.data.deletedData} of csvs data`
+      );
+    });
   };
 
   const handleSelect = (fileName: string): void => {

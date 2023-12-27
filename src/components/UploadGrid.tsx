@@ -10,9 +10,9 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { backEndUrl } from "../config.ts";
 import "react-toastify/dist/ReactToastify.css";
 import { errorToast, successfulToast } from "../functions/toast.message.ts";
+import { axiosInstance } from "../axios.instance.ts";
 
 const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
@@ -59,52 +59,33 @@ export default function Upload() {
   const pageChange = (pageInfo) => {
     setLoading(true);
     setPaginationModel(pageInfo);
-    axios
-      .post(
-        backEndUrl + "/csv/analisys/data",
-        {
-          options: {
-            skips: pageInfo.page * pageInfo.pageSize,
-            limits: pageInfo.pageSize,
-          },
+    axiosInstance
+      .post("/csv/analisys/data", {
+        options: {
+          skips: pageInfo.page * pageInfo.pageSize,
+          limits: pageInfo.pageSize,
         },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
+      })
       .then((res) => {
+        if (res == null) {
+          return;
+        }
         setDataForUpload(res.data);
-      })
-      .catch((err) => {
-        errorToast(err.message);
-        console.log(err);
       });
-    axios
-      .post(
-        backEndUrl + "/csv/analisys/count",
-        {},
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
-      .then((res) => {
-        setLoading(false);
-        setDataForUploadLenght(res.data);
-      })
-      .catch((err) => {
-        errorToast(err.message);
-        console.log(err);
-      });
+
+    axiosInstance.post("/csv/analisys/count", {}).then((res) => {
+      setLoading(false);
+      setDataForUploadLenght(res.data);
+    });
   };
 
   if (start) {
     setStart(false);
     pageChange(paginationModel);
-    axios.get(backEndUrl + "/csv/check/reading").then((res) => {
+    axios.get("/csv/check/reading").then((res) => {
+      if (res == null) {
+        return;
+      }
       setStatus(res.data.status);
       if (res.data.uploadedData !== 0 && res.data.lines !== 0)
         setProgress((res.data.uploadedData / res.data.lines) * 100);
@@ -128,14 +109,16 @@ export default function Upload() {
     }
     setStatus("Reading");
     if (update)
-      axios
-        .post(backEndUrl + "/csv/update", formData, {
+      axiosInstance
+        .post("/csv/update", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: "Bearer " + localStorage.access_token,
           },
         })
         .then((res) => {
+          if (res == null) {
+            return;
+          }
           for (let i = 0; i < res.data.result.length; i++) {
             if (res.data.result[i].error) {
               errorToast(
@@ -151,17 +134,18 @@ export default function Upload() {
         })
         .catch((e) => {
           setStatus("ERROR");
-          errorToast(e);
         });
     else {
-      axios
-        .post(backEndUrl + "/csv/upload", formData, {
+      axiosInstance
+        .post("/csv/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: "Bearer " + localStorage.access_token,
           },
         })
         .then((res) => {
+          if (res == null) {
+            return;
+          }
           for (let i = 0; i < res.data.result.length; i++) {
             if (res.data.result[i].error) {
               errorToast(
@@ -177,7 +161,6 @@ export default function Upload() {
         })
         .catch((e) => {
           setStatus("ERROR");
-          errorToast(e);
         });
     }
   };
@@ -186,7 +169,7 @@ export default function Upload() {
   React.useEffect(() => {
     const timer = setInterval(() => {
       if (status !== "Uploaded" || fileUploading !== 0)
-        axios.get(backEndUrl + "/csv/check/reading").then((res: any) => {
+        axios.get("/csv/check/reading").then((res: any) => {
           setFileUploading(res.numOfFile);
           setStatus(res.data.status);
           if (res.data.uploadedData !== 0 && res.data.lines !== 0)

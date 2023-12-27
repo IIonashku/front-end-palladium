@@ -1,8 +1,6 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import axios from "axios";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { backEndUrl } from "../config.ts";
 import {
   Backdrop,
   Button,
@@ -17,7 +15,8 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { errorToast, successfulToast } from "../functions/toast.message.ts";
+import { successfulToast } from "../functions/toast.message.ts";
+import { axiosInstance } from "../axios.instance.ts";
 
 type tableData = {
   _id: string;
@@ -148,36 +147,19 @@ export default function TableGrid() {
     setLoading(true);
     const toSkip = paginationModel.page * paginationModel.pageSize;
     const limits = paginationModel.pageSize;
-    axios
-      .post(
-        backEndUrl + "/csv/count",
-        {
-          filters: filters,
-        },
-        {
-          headers: { Authorization: "Bearer " + localStorage.access_token },
-        }
-      )
+    axiosInstance
+      .post("/csv/count", {
+        filters: filters,
+      })
       .then((res) => {
         setDataLenght(res.data);
-      })
-      .catch((e) => {
-        console.log(e);
       });
-    axios
-      .post(
-        backEndUrl + "/csv/data/",
-        {
-          options: { skips: toSkip, limits: limits },
-          filters: filters,
-          displayStrings: displaingValues,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
+    axiosInstance
+      .post("/csv/data/", {
+        options: { skips: toSkip, limits: limits },
+        filters: filters,
+        displayStrings: displaingValues,
+      })
       .then((res) => {
         setData(res.data);
         setLoading(false);
@@ -189,39 +171,22 @@ export default function TableGrid() {
     const toSkip = pageInfo.page * pageInfo.pageSize;
     const limits = pageInfo.pageSize;
 
-    axios
-      .post(
-        backEndUrl + "/csv/data/",
-        {
-          options: { skips: toSkip, limits: limits },
-          filters: filters,
-          displayStrings: displaingValues,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
+    axiosInstance
+      .post("/csv/data/", {
+        options: { skips: toSkip, limits: limits },
+        filters: filters,
+        displayStrings: displaingValues,
+      })
       .then((res) => {
         setData(res.data);
         setLoading(false);
       });
-    axios
-      .post(
-        backEndUrl + "/csv/count",
-        {
-          filters: filters,
-        },
-        {
-          headers: { Authorization: "Bearer " + localStorage.access_token },
-        }
-      )
+    axiosInstance
+      .post("/csv/count", {
+        filters: filters,
+      })
       .then((res) => {
         setDataLenght(res.data);
-      })
-      .catch((e) => {
-        console.log(e);
       });
     setPaginationModel(pageInfo);
   };
@@ -242,25 +207,24 @@ export default function TableGrid() {
   }
 
   const handleExport = () => {
-    axios
+    axiosInstance
       .post(
-        backEndUrl + `/csv/export/${exportFile}`,
+        `/csv/export/${exportFile}`,
         {
           filters: filters,
           displayStrings: displaingValues,
         },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.access_token,
             "Access-Control-Allow-Origin": "*",
           },
         }
       )
       .then(async (res) => {
+        if (res == null) {
+          return;
+        }
         successfulToast("File fully created");
-      })
-      .catch((e) => {
-        console.log(e);
       });
   };
 
@@ -280,15 +244,12 @@ export default function TableGrid() {
         inBase: inBaseFilter,
       };
     if (listTag && listTag.length >= 1) {
-      axios
-        .get(backEndUrl + `/csv/analis/data/count/${listTag}`, {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        })
-        .then((res) => {
-          setDataLenght(res.data);
-        });
+      axiosInstance.get(`/csv/analis/data/count/${listTag}`).then((res) => {
+        if (res == null) {
+          return;
+        }
+        setDataLenght(res.data);
+      });
     }
     refreshPage();
   };
@@ -314,81 +275,63 @@ export default function TableGrid() {
   };
 
   const handleUpdateCarrier = (): void => {
-    axios
-      .post(
-        backEndUrl + "/csv/count",
-        {
-          filters: {
-            phoneNumber: filters.phoneNumber,
-            listTag: filters.listTag,
-            carrier: "nullTypeAndCarrier",
-            inBase: filters.inBase,
-          },
+    axiosInstance
+      .post("/csv/count", {
+        filters: {
+          phoneNumber: filters.phoneNumber,
+          listTag: filters.listTag,
+          carrier: "nullTypeAndCarrier",
+          inBase: filters.inBase,
         },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
+      })
       .then((res) => {
+        if (res == null) {
+          return;
+        }
         setCountToUpdate(res.data);
         setOpenOverlay(1);
-      })
-      .catch((e) => {
-        errorToast(e.message);
       });
   };
 
   const handleConfirmUpdate = async () => {
     const phoneArray: string[] = [];
 
-    await axios
-      .post(
-        backEndUrl + "/csv/data",
-        {
-          options: { limits: 0, skips: 0 },
-          filters: {
-            phoneNumber: filters.phoneNumber,
-            listTag: filters.listTag,
-            carrier: "nullTypeAndCarrier",
-            inBase: filters.inBase,
-          },
-          displayStrings: displaingValues,
+    await axiosInstance
+      .post("/csv/data", {
+        options: { limits: 0, skips: 0 },
+        filters: {
+          phoneNumber: filters.phoneNumber,
+          listTag: filters.listTag,
+          carrier: "nullTypeAndCarrier",
+          inBase: filters.inBase,
         },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.access_token,
-          },
-        }
-      )
+        displayStrings: displaingValues,
+      })
       .then((res) => {
+        if (res == null) {
+          return;
+        }
         for (let i = 0; i < res.data.length; i++) {
           phoneArray.push(res.data[i].phoneNumber);
         }
-      })
-      .catch((e) => {
-        errorToast(e.message);
       });
-    axios
+    axiosInstance
       .post(
-        backEndUrl + "/csv/check/carrier",
+        "/csv/check/carrier",
         {
           phoneNumber: phoneArray,
         },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.access_token,
             "Access-Control-Allow-Origin": "*",
           },
         }
       )
       .then((res) => {
+        if (res == null) {
+          return;
+        }
         console.log(res.data);
-      })
-      .catch((e) => {
-        console.log(e);
-        errorToast(e.message);
       });
   };
 
