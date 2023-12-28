@@ -7,6 +7,7 @@ import Upload from "./components/UploadGrid.tsx";
 import { User } from "./components/User.tsx";
 import TagList from "./components/TagList.tsx";
 import { Export } from "./components/Export.tsx";
+import { NotFound } from "./components/NotFoundPage.tsx";
 
 export let isLogIn = false;
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/tag/lists" element={<Main Element={TagList} />}></Route>
           <Route path="/export" element={<Main Element={Export} />}></Route>
           <Route path="/" element={<Login />}></Route>
+          <Route path="*" element={<NotFound />}></Route>
         </Routes>
       </BrowserRouter>
     </div>
