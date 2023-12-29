@@ -13,6 +13,7 @@ import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import { errorToast, successfulToast } from "../functions/toast.message.ts";
 import { axiosInstance } from "../axios.instance.ts";
+import { backEndUrl } from "../config.ts";
 
 const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
@@ -29,6 +30,11 @@ const columns: GridColDef[] = [
   {
     field: "duplicateInBase",
     headerName: "Duplicate in base",
+    width: 170,
+  },
+  {
+    field: "nullTypeAndCarrier",
+    headerName: "Null type and carrier",
     width: 170,
   },
   {
@@ -82,7 +88,7 @@ export default function Upload() {
   if (start) {
     setStart(false);
     pageChange(paginationModel);
-    axios.get("/csv/check/reading").then((res) => {
+    axios.get(backEndUrl + "/csv/check/reading").then((res) => {
       if (res == null) {
         return;
       }
@@ -169,7 +175,7 @@ export default function Upload() {
   React.useEffect(() => {
     const timer = setInterval(() => {
       if (status !== "Uploaded" || fileUploading !== 0)
-        axios.get("/csv/check/reading").then((res: any) => {
+        axios.get(backEndUrl + "/csv/check/reading").then((res: any) => {
           setFileUploading(res.numOfFile);
           setStatus(res.data.status);
           if (res.data.uploadedData !== 0 && res.data.lines !== 0)

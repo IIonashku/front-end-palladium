@@ -181,13 +181,6 @@ export default function TableGrid() {
         setData(res.data);
         setLoading(false);
       });
-    axiosInstance
-      .post("/csv/count", {
-        filters: filters,
-      })
-      .then((res) => {
-        setDataLenght(res.data);
-      });
     setPaginationModel(pageInfo);
   };
 
@@ -244,12 +237,17 @@ export default function TableGrid() {
         inBase: inBaseFilter,
       };
     if (listTag && listTag.length >= 1) {
-      axiosInstance.get(`/csv/analis/data/count/${listTag}`).then((res) => {
-        if (res == null) {
-          return;
-        }
-        setDataLenght(res.data);
-      });
+      axiosInstance
+        .post(`/csv/analis/data/count/${listTag}`, {
+          inBase: !!inBase,
+          nullTypeAndCarrier: !!nullTypeAndCarrier,
+        })
+        .then((res) => {
+          if (res == null) {
+            return;
+          }
+          setDataLenght(res.data);
+        });
     }
     refreshPage();
   };
