@@ -15,7 +15,7 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { successfulToast } from "../functions/toast.message.ts";
+import { errorToast, successfulToast } from "../functions/toast.message.ts";
 import { axiosInstance } from "../axios.instance.ts";
 
 type tableData = {
@@ -115,6 +115,8 @@ export default function TableGrid() {
     React.useState<boolean>(false);
   const [countToUpdate, setCountToUpdate] = React.useState(0);
   const [displaingValues, setDisplaingValues] = React.useState<string[]>([]);
+  const [phoneFilterError, setPhoneFilterError] = React.useState(false);
+  const [tagFilterError, setTagFilterError] = React.useState(false);
   const options = [
     "phoneNumber",
     "firstName",
@@ -222,34 +224,38 @@ export default function TableGrid() {
   };
 
   const handleApply = () => {
-    if (nullTypeAndCarrier) {
-      filters = {
-        listTag: ltFilter,
-        phoneNumber: pnFilter,
-        carrier: "nullTypeAndCarrier",
-        inBase: inBaseFilter,
-      };
-    } else
-      filters = {
-        listTag: ltFilter,
-        phoneNumber: pnFilter,
-        carrier: cFilter,
-        inBase: inBaseFilter,
-      };
-    if (listTag && listTag.length >= 1) {
-      axiosInstance
-        .post(`/csv/analis/data/count/${listTag}`, {
-          inBase: !!inBase,
-          nullTypeAndCarrier: !!nullTypeAndCarrier,
-        })
-        .then((res) => {
-          if (res == null) {
-            return;
-          }
-          setDataLenght(res.data);
-        });
+    if (!tagFilterError) {
+      if (nullTypeAndCarrier) {
+        filters = {
+          listTag: ltFilter,
+          phoneNumber: pnFilter,
+          carrier: "nullTypeAndCarrier",
+          inBase: inBaseFilter,
+        };
+      } else
+        filters = {
+          listTag: ltFilter,
+          phoneNumber: pnFilter,
+          carrier: cFilter,
+          inBase: inBaseFilter,
+        };
+      if (listTag && listTag.length >= 1) {
+        axiosInstance
+          .post(`/csv/analis/data/count/${listTag}`, {
+            inBase: !!inBase,
+            nullTypeAndCarrier: !!nullTypeAndCarrier,
+          })
+          .then((res) => {
+            if (res == null) {
+              return;
+            }
+            setDataLenght(res.data);
+          });
+      }
+      refreshPage();
+    } else {
+      errorToast("Filter error, check filter and try again");
     }
-    refreshPage();
   };
 
   const hanldeReset = () => {
@@ -268,7 +274,6 @@ export default function TableGrid() {
     setCarier("");
     setInBase(undefined);
     setNullTypeAndCarrier(false);
-
     refreshPage();
   };
 
@@ -361,24 +366,43 @@ export default function TableGrid() {
         <Box>
           <Box sx={{ margin: 3 }}>
             <Input
+              error={tagFilterError}
               id="listTag"
               name="listTag"
               placeholder="Input tag"
               value={listTag}
               onChange={async (e) => {
                 setListTag(e.target.value);
-                ltFilter = e.target.value;
+                const valid = await axiosInstance.post("/csv/analisys/check/", {
+                  fileName: e.target.value,
+                });
+
+                if (valid.data) {
+                  setTagFilterError(false);
+
+                  ltFilter = e.target.value;
+                } else {
+                  setTagFilterError(true);
+                  setListTag(e.target.value);
+                  ltFilter = e.target.value;
+                }
               }}></Input>
           </Box>
           <Box sx={{ margin: 3 }}>
             <Input
+              error={phoneFilterError}
               id="phoneNumber"
               name="phoneNumber"
               placeholder="Input phone number"
               value={phoneNumber}
               onChange={async (e) => {
-                setPhoneNumber(e.target.value);
-                pnFilter = e.target.value;
+                if (e.target.value.length >= 11) {
+                  setPhoneFilterError(true);
+                } else {
+                  setPhoneFilterError(false);
+                  setPhoneNumber(e.target.value);
+                  pnFilter = e.target.value;
+                }
               }}></Input>
           </Box>
           <Box sx={{ margin: 3, marginBottom: 0 }}>
@@ -474,6 +498,8 @@ export default function TableGrid() {
               Null carrier and type
             </Typography>
             <Checkbox
+              value={nullTypeAndCarrier}
+              checked={nullTypeAndCarrier}
               onChange={(e) => {
                 cFilter = "";
                 if (nullTypeAndCarrier === true) setNullTypeAndCarrier(false);
