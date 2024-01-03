@@ -1,6 +1,10 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridSlotsComponentsProps,
+} from "@mui/x-data-grid";
 import {
   Backdrop,
   Button,
@@ -17,6 +21,8 @@ import {
 } from "@mui/material";
 import { errorToast, successfulToast } from "../functions/toast.message.ts";
 import { axiosInstance } from "../axios.instance.ts";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 type tableData = {
   _id: string;
@@ -242,7 +248,7 @@ export default function TableGrid() {
       if (listTag && listTag.length >= 1) {
         axiosInstance
           .post(`/csv/analis/data/count/${listTag}`, {
-            inBase: !!inBase,
+            inBase: inBase === undefined ? undefined : inBase,
             nullTypeAndCarrier: !!nullTypeAndCarrier,
           })
           .then((res) => {
@@ -627,8 +633,14 @@ export default function TableGrid() {
           columns={columns}
           pageSizeOptions={[5, 10, 25, 50, 100]}
           onPaginationModelChange={pageChange}
-          loading={isLoading}
           style={{ minWidth: "100%" }}
+          slotProps={{
+            footer: {
+              page: paginationModel.page,
+              pageSize: paginationModel.pageSize,
+              maxDataNumber: dataLenght,
+            },
+          }}
         />
         <Box
           sx={{
@@ -655,6 +667,55 @@ export default function TableGrid() {
           </Button>
         </Box>
       </Box>
+    </div>
+  );
+}
+
+declare module "@mui/x-data-grid" {
+  interface FooterPropsOverrides {
+    page: number;
+    pageSize: number;
+    maxDataNumber: number;
+  }
+}
+
+function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
+  if (props.page === undefined) props.page = 0;
+  if (props.pageSize === undefined) props.pageSize = 5;
+  if (props.maxDataNumber === undefined) props.maxDataNumber = 0;
+  return (
+    <div
+      style={{
+        padding: 10,
+        display: "flex",
+        flexDirection: "row-reverse",
+        alignItems: "center",
+      }}>
+      <Button
+        style={{ padding: 8, height: 24, maxWidth: 24 }}
+        sx={{
+          ...(props.page * props.pageSize >= props.maxDataNumber && {
+            color: "grey",
+          }),
+          color: "black",
+        }}
+        disabled={props.page * props.pageSize >= props.maxDataNumber}
+        type="button">
+        <ChevronRightIcon />
+      </Button>
+      <Button
+        sx={{
+          ...(props.page * props.pageSize >= props.maxDataNumber && {
+            color: "grey",
+          }),
+          color: "black",
+        }}
+        disabled={props.page === 0}
+        style={{ padding: 8, height: 24, maxWidth: 24 }}>
+        <ChevronLeftIcon />
+      </Button>
+      {props.page && props.pageSize ? props.page * props.pageSize : 0} -
+      {props.maxDataNumber}
     </div>
   );
 }
