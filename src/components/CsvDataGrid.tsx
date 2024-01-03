@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox,
   FormControl,
+  IconButton,
   Input,
   InputLabel,
   ListItemText,
@@ -119,6 +120,7 @@ export default function TableGrid() {
   });
   const [nullTypeAndCarrier, setNullTypeAndCarrier] =
     React.useState<boolean>(false);
+  const [countStatus, setCountStatus] = React.useState("Max");
   const [countToUpdate, setCountToUpdate] = React.useState(0);
   const [displaingValues, setDisplaingValues] = React.useState<string[]>([]);
   const [phoneFilterError, setPhoneFilterError] = React.useState(false);
@@ -633,12 +635,16 @@ export default function TableGrid() {
           columns={columns}
           pageSizeOptions={[5, 10, 25, 50, 100]}
           onPaginationModelChange={pageChange}
+          loading={isLoading}
           style={{ minWidth: "100%" }}
+          slots={{ footer: CustomFooter }}
           slotProps={{
             footer: {
               page: paginationModel.page,
               pageSize: paginationModel.pageSize,
               maxDataNumber: dataLenght,
+              changePage: pageChange,
+              status: "Max",
             },
           }}
         />
@@ -676,13 +682,23 @@ declare module "@mui/x-data-grid" {
     page: number;
     pageSize: number;
     maxDataNumber: number;
+    changePage: Function;
+    status: string;
   }
 }
 
 function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
+  const options = [5, 10, 25, 50, 100];
+  const [displaingValues, setDisplaingValues] = React.useState<number>(10);
+  function handleChange(event: SelectChangeEvent<number>): void {
+    setDisplaingValues(Number(event.target.value));
+    props.changePage({ page: props.page, pageSize: event.target.value });
+  }
+
   if (props.page === undefined) props.page = 0;
   if (props.pageSize === undefined) props.pageSize = 5;
   if (props.maxDataNumber === undefined) props.maxDataNumber = 0;
+  if (props.status === undefined) props.status = "Max";
   return (
     <div
       style={{
@@ -691,31 +707,83 @@ function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
         flexDirection: "row-reverse",
         alignItems: "center",
       }}>
-      <Button
-        style={{ padding: 8, height: 24, maxWidth: 24 }}
-        sx={{
-          ...(props.page * props.pageSize >= props.maxDataNumber && {
-            color: "grey",
-          }),
-          color: "black",
-        }}
-        disabled={props.page * props.pageSize >= props.maxDataNumber}
-        type="button">
-        <ChevronRightIcon />
-      </Button>
-      <Button
-        sx={{
-          ...(props.page * props.pageSize >= props.maxDataNumber && {
-            color: "grey",
-          }),
-          color: "black",
-        }}
-        disabled={props.page === 0}
-        style={{ padding: 8, height: 24, maxWidth: 24 }}>
-        <ChevronLeftIcon />
-      </Button>
-      {props.page && props.pageSize ? props.page * props.pageSize : 0} -
-      {props.maxDataNumber}
+      <IconButton
+        disabled={
+          props.page * props.pageSize + props.pageSize >= props.maxDataNumber
+        }>
+        <Button
+          style={{
+            padding: 8,
+            maxWidth: "24px",
+            maxHeight: "24px",
+            minWidth: "24px",
+            minHeight: "24px",
+          }}
+          sx={{
+            ...(props.page * props.pageSize + props.pageSize >=
+              props.maxDataNumber && {
+              color: "grey",
+            }),
+            color: "black",
+          }}
+          disabled={
+            props.page * props.pageSize + props.pageSize >= props.maxDataNumber
+          }
+          type="button"
+          onClick={() => {
+            props.changePage({
+              page: props.page + 1,
+              pageSize: props.pageSize,
+            });
+          }}>
+          <ChevronRightIcon />
+        </Button>
+      </IconButton>
+      <IconButton disabled={props.page === 0}>
+        <Button
+          sx={{
+            ...(props.page * props.pageSize + props.pageSize >=
+              props.maxDataNumber && {
+              color: "grey",
+            }),
+            color: "black",
+          }}
+          disabled={props.page === 0}
+          style={{
+            padding: 8,
+            maxWidth: "24px",
+            maxHeight: "24px",
+            minWidth: "24px",
+            minHeight: "24px",
+          }}
+          onClick={() => {
+            props.changePage({
+              page: props.page - 1,
+              pageSize: props.pageSize,
+            });
+          }}>
+          <ChevronLeftIcon />
+        </Button>
+      </IconButton>
+      <Typography style={{ padding: 8 }}>{props.status}</Typography>
+      <Typography style={{ padding: 8 }}>
+        {props.page && props.pageSize ? props.page * props.pageSize : 0} -{" "}
+        {props.maxDataNumber}{" "}
+      </Typography>
+      <FormControl variant="standard" style={{ margin: 5 }}>
+        <Select
+          labelId="mutiple-checkbox-label"
+          defaultValue={25}
+          value={displaingValues}
+          onChange={handleChange}>
+          {options.map((option) => (
+            <MenuItem key={option} value={option}>
+              <ListItemText primary={option} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Typography style={{ padding: 8 }}>Change row count: </Typography>
     </div>
   );
 }
