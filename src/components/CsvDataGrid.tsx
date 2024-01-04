@@ -163,6 +163,7 @@ export default function TableGrid() {
       })
       .then((res) => {
         setDataLenght(res.data);
+        setCountStatus("Max");
       });
     axiosInstance
       .post("/csv/data/", {
@@ -232,6 +233,7 @@ export default function TableGrid() {
   };
 
   const handleApply = () => {
+    setCountStatus("Uploading");
     if (!tagFilterError) {
       if (nullTypeAndCarrier) {
         filters = {
@@ -258,11 +260,13 @@ export default function TableGrid() {
               return;
             }
             setDataLenght(res.data);
+            setCountStatus("Max");
           });
       }
       refreshPage();
     } else {
       errorToast("Filter error, check filter and try again");
+      setCountStatus("Max");
     }
   };
 
@@ -644,7 +648,7 @@ export default function TableGrid() {
               pageSize: paginationModel.pageSize,
               maxDataNumber: dataLenght,
               changePage: pageChange,
-              status: "Max",
+              status: countStatus,
             },
           }}
         />

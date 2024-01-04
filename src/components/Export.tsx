@@ -1,4 +1,11 @@
-import { Stack, Button, Typography, Dialog } from "@mui/material";
+import {
+  Stack,
+  Button,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import React from "react";
@@ -11,7 +18,12 @@ export function Export() {
   const [start, setStart] = React.useState<boolean>(true);
   const [brokenCarrierLenght, setBrokenCarrierLenght] = React.useState(0);
   const [brokenLastnameLenght, setBrokenLastnameLenght] = React.useState(0);
+  const [DBValidData, setDBValidData] = React.useState(0);
+  const [DBNullTypeAndCarrierCount, setDBNullTypeAndCarrier] =
+    React.useState(0);
   const [info, setInfo] = React.useState(false);
+  const [openConfirm, setOpenConfirm] = React.useState(false);
+  const [action, setAction] = React.useState("");
   const [fileInfo, setFileInfo] = React.useState({
     listTag: "",
     phoneNumber: "",
@@ -28,7 +40,7 @@ export function Export() {
     });
   };
 
-  const brokenDataLenght = () => {
+  const DBInfo = () => {
     axiosInstance.get("/csv/fix/count").then((res) => {
       if (res == null) {
         return;
@@ -36,12 +48,32 @@ export function Export() {
       setBrokenCarrierLenght(res.data.brokenCarrier);
       setBrokenLastnameLenght(res.data.brokenLastname);
     });
+    axiosInstance.get("/csv/analis/get/DBInfo").then((res) => {
+      if (res == null) {
+        return;
+      }
+      setDBNullTypeAndCarrier(res.data.nullTypeAndCarrier);
+      setDBValidData(res.data.validDataCounter);
+    });
+  };
+
+  const handleConfirmUpdate = () => {
+    if (action === "DBInfo") {
+      axiosInstance.get("/csv/analisys/all/set/").then((res) => {
+        console.log(res.data);
+      });
+    } else if (action === "listTag") {
+      axiosInstance.get("/csv/analisys/tags/set/").then((res) => {
+        console.log(res.data);
+      });
+    }
+    handleClose();
   };
 
   if (start) {
     setStart(false);
     getFiles();
-    brokenDataLenght();
+    DBInfo();
   }
   const handleFixCarrier = () => {
     axiosInstance.get("/csv/fix/carrier").then((res) => {
@@ -113,6 +145,15 @@ export function Export() {
       numData: file.dataCounter,
     });
     setInfo(true);
+  };
+
+  const handleClose = (): void => {
+    setOpenConfirm(false);
+  };
+
+  const openConfirmDialog = (action: string) => {
+    setAction(action);
+    setOpenConfirm(true);
   };
 
   return (
@@ -303,6 +344,10 @@ export function Export() {
         <Typography sx={{ margin: "1%" }}>
           Broken Carrier in data: {brokenCarrierLenght}
         </Typography>
+        <Typography sx={{ margin: "1%" }}>
+          Null type and carrier: {DBNullTypeAndCarrierCount}
+        </Typography>{" "}
+        <Typography sx={{ margin: "1%" }}>Valid data: {DBValidData}</Typography>
         <Button
           variant="contained"
           style={{ margin: "1.5%" }}
@@ -319,6 +364,44 @@ export function Export() {
           }}>
           Fix carrier
         </Button>
+        <Button
+          variant="contained"
+          style={{ margin: "1.5%", color: "red" }}
+          onClick={() => {
+            openConfirmDialog("DBInfo");
+          }}>
+          Start all DB analisys
+        </Button>
+        <Button
+          variant="contained"
+          style={{ margin: "1.5%", color: "red" }}
+          onClick={() => {
+            openConfirmDialog("listTag");
+          }}>
+          Start all list tag analisys
+        </Button>
+        <Dialog
+          open={openConfirm}
+          onClose={handleClose}
+          aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title" style={{ textAlign: "center" }}>
+            Confirm updating analisys data
+          </DialogTitle>
+          <Typography
+            style={{ margin: "20px", textAlign: "center", color: "red" }}>
+            WARNING, once it started, it can cause lagging of all query during
+            processing of data
+          </Typography>
+          <DialogActions
+            style={{ display: "flex", justifyContent: "space-evenly" }}>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmUpdate} color="primary">
+              Confirm update
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );
