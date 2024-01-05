@@ -34,7 +34,7 @@ const columns: GridColDef[] = [
   },
   {
     field: "nullTypeAndCarrier",
-    headerName: "Null type and carrier",
+    headerName: "MLR missing",
     width: 170,
   },
   {

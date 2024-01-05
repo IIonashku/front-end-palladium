@@ -9,6 +9,7 @@ import {
   Backdrop,
   Button,
   Checkbox,
+  Chip,
   FormControl,
   IconButton,
   Input,
@@ -24,6 +25,7 @@ import { errorToast, successfulToast } from "../functions/toast.message.ts";
 import { axiosInstance } from "../axios.instance.ts";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { debounce } from "@mui/material/utils";
 
 type tableData = {
   _id: string;
@@ -125,15 +127,6 @@ export default function TableGrid() {
   const [displaingValues, setDisplaingValues] = React.useState<string[]>([]);
   const [phoneFilterError, setPhoneFilterError] = React.useState(false);
   const [tagFilterError, setTagFilterError] = React.useState(false);
-  const options = [
-    "phoneNumber",
-    "firstName",
-    "lastName",
-    "type",
-    "carrier",
-    "inBase",
-    "listTag",
-  ];
 
   const updateCarrierRef = React.useRef<any>();
 
@@ -350,9 +343,9 @@ export default function TableGrid() {
       });
   };
 
-  function handleChange(event: SelectChangeEvent<string[]>): void {
-    if (Array.isArray(event.target.value)) {
-      setDisplaingValues(event.target.value);
+  function handleChange(options: string[]): void {
+    if (Array.isArray(options)) {
+      setDisplaingValues(options);
     }
   }
 
@@ -408,7 +401,7 @@ export default function TableGrid() {
               placeholder="Input phone number"
               value={phoneNumber}
               onChange={async (e) => {
-                if (e.target.value.length >= 11) {
+                if (e.target.value.length > 11) {
                   setPhoneFilterError(true);
                 } else {
                   setPhoneFilterError(false);
@@ -428,29 +421,7 @@ export default function TableGrid() {
                 cFilter = e.target.value;
               }}></Input>
           </Box>
-          <Box sx={{ margin: 3, marginBottom: 0 }}>
-            <Input
-              type="number"
-              placeholder="Input page number…"
-              value={pageNumber}
-              onChange={(e) => {
-                if (
-                  Number(e.target.value) >= 0 &&
-                  Number(e.target.value) * paginationModel.pageSize <=
-                    dataLenght
-                ) {
-                  setPaginationModel({
-                    page: Number(e.target.value),
-                    pageSize: paginationModel.pageSize,
-                  });
-                  pageChange({
-                    page: e.target.value,
-                    pageSize: paginationModel.pageSize,
-                  });
-                }
-              }}
-            />
-          </Box>
+          <Box sx={{ margin: 3, marginBottom: 0 }}></Box>
           <Box
             sx={{
               marginLeft: 3,
@@ -507,11 +478,12 @@ export default function TableGrid() {
                 display: "grid",
                 alignItems: "center",
               }}>
-              Null carrier and type
+              HLR Missing
             </Typography>
             <Checkbox
               value={nullTypeAndCarrier}
               checked={nullTypeAndCarrier}
+              sx={{ marginLeft: 2.2 }}
               onChange={(e) => {
                 cFilter = "";
                 if (nullTypeAndCarrier === true) setNullTypeAndCarrier(false);
@@ -530,7 +502,7 @@ export default function TableGrid() {
               marginBottom: 0,
               maxWidth: "75%",
             }}>
-            Update null carrier
+            Update MLR
           </Button>
           <Backdrop
             ref={updateCarrierRef}
@@ -607,26 +579,7 @@ export default function TableGrid() {
               display: "flex",
               marginTop: 1,
               marginRight: 1,
-            }}>
-            <FormControl fullWidth>
-              <InputLabel id="mutiple-checkbox-label">
-                Display Options
-              </InputLabel>
-              <Select
-                labelId="mutiple-checkbox-label"
-                multiple
-                value={displaingValues}
-                onChange={handleChange}
-                input={<OutlinedInput label="Display Options" />}>
-                {options.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <Checkbox checked={displaingValues.indexOf(option) > -1} />
-                    <ListItemText primary={option} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
+            }}></Box>
         </Box>
       </Box>
       <Box sx={{ maxHeight: 770, minWidth: "100%" }}>
@@ -649,6 +602,7 @@ export default function TableGrid() {
               maxDataNumber: dataLenght,
               changePage: pageChange,
               status: countStatus,
+              changeDisplayOptions: handleChange,
             },
           }}
         />
@@ -688,16 +642,35 @@ declare module "@mui/x-data-grid" {
     maxDataNumber: number;
     changePage: Function;
     status: string;
+    changeDisplayOptions: Function;
+    displaingValues: string[];
   }
 }
 
 function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
-  const options = [5, 10, 25, 50, 100];
-  const [displaingValues, setDisplaingValues] = React.useState<number>(10);
-  function handleChange(event: SelectChangeEvent<number>): void {
-    setDisplaingValues(Number(event.target.value));
+  const rowOptions = [5, 10, 25, 50, 100];
+  const [displaingRows, setDisplaingRows] = React.useState<number>(10);
+  const [displaingValues, setDisplaingValues] = React.useState<string[]>([]);
+  const displayOptions = [
+    "phoneNumber",
+    "firstName",
+    "lastName",
+    "type",
+    "carrier",
+    "inBase",
+    "listTag",
+  ];
+  function handleChangePage(event: SelectChangeEvent<number>): void {
+    setDisplaingRows(Number(event.target.value));
     props.changePage({ page: props.page, pageSize: event.target.value });
   }
+
+  const handleChangeDisplayOptions = (event: SelectChangeEvent<string[]>) => {
+    if (Array.isArray(event.target.value)) {
+      setDisplaingValues(event.target.value);
+      props.changeDisplayOptions(event.target.value);
+    }
+  };
 
   if (props.page === undefined) props.page = 0;
   if (props.pageSize === undefined) props.pageSize = 5;
@@ -778,9 +751,9 @@ function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
         <Select
           labelId="mutiple-checkbox-label"
           defaultValue={25}
-          value={displaingValues}
-          onChange={handleChange}>
-          {options.map((option) => (
+          value={displaingRows}
+          onChange={handleChangePage}>
+          {rowOptions.map((option) => (
             <MenuItem key={option} value={option}>
               <ListItemText primary={option} />
             </MenuItem>
@@ -788,6 +761,51 @@ function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
         </Select>
       </FormControl>
       <Typography style={{ padding: 8 }}>Change row count: </Typography>
+      <Input
+        style={{ margin: 10, padding: 0 }}
+        type="number"
+        placeholder="Input page number…"
+        value={pageNumber}
+        onChange={(e) => {
+          if (props.pageSize === undefined) props.pageSize = 0;
+          if (props.maxDataNumber === undefined) props.maxDataNumber = 0;
+          if (
+            Number(e.target.value) >= 0 &&
+            Number(e.target.value) * props.pageSize <= props.maxDataNumber
+          ) {
+            debounce(
+              props.changePage({
+                page: Number(e.target.value),
+                pageSize: props.pageSize,
+              }),
+              100
+            );
+          }
+        }}
+      />
+      <FormControl fullWidth style={{ minWidth: "30%", maxWidth: "40%" }}>
+        <InputLabel id="mutiple-checkbox-label">Display Options</InputLabel>
+        <Select
+          labelId="mutiple-checkbox-label"
+          multiple
+          value={displaingValues}
+          onChange={handleChangeDisplayOptions}
+          input={<OutlinedInput label="Display Options" />}
+          renderValue={(displaingValues) => (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+              {displaingValues.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+            </Box>
+          )}>
+          {displayOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              <Checkbox checked={displaingValues.indexOf(option) > -1} />
+              <ListItemText primary={option} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </div>
   );
 }
