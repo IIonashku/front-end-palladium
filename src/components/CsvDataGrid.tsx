@@ -253,7 +253,6 @@ export default function TableGrid() {
               return;
             }
             setDataLenght(res.data);
-            setCountStatus("Max");
           });
       }
       refreshPage();
@@ -302,32 +301,16 @@ export default function TableGrid() {
   };
 
   const handleConfirmUpdate = async () => {
-    const phoneArray: string[] = [];
-
-    await axiosInstance
-      .post("/csv/data", {
-        options: { limits: 0, skips: 0 },
-        filters: {
-          phoneNumber: filters.phoneNumber,
-          listTag: filters.listTag,
-          carrier: "nullTypeAndCarrier",
-          inBase: filters.inBase,
-        },
-        displayStrings: displaingValues,
-      })
-      .then((res) => {
-        if (res == null) {
-          return;
-        }
-        for (let i = 0; i < res.data.length; i++) {
-          phoneArray.push(res.data[i].phoneNumber);
-        }
-      });
     axiosInstance
       .post(
         "/csv/check/carrier",
         {
-          phoneNumber: phoneArray,
+          filters: {
+            phoneNumber: filters.phoneNumber,
+            listTag: filters.listTag,
+            carrier: "nullTypeAndCarrier",
+            inBase: filters.inBase,
+          },
         },
         {
           headers: {
