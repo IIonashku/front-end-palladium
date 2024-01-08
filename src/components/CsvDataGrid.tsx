@@ -26,6 +26,7 @@ import { axiosInstance } from "../axios.instance.ts";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { debounce } from "@mui/material/utils";
+import { availableCarrier } from "../config.ts";
 
 type tableData = {
   _id: string;
@@ -228,6 +229,8 @@ export default function TableGrid() {
   const handleApply = () => {
     setCountStatus("Uploading");
     if (!tagFilterError) {
+      if (carrier in availableCarrier) {
+      }
       if (nullTypeAndCarrier) {
         filters = {
           listTag: ltFilter,
@@ -247,6 +250,7 @@ export default function TableGrid() {
           .post(`/csv/analis/data/count/${listTag}`, {
             inBase: inBase === undefined ? undefined : inBase,
             nullTypeAndCarrier: !!nullTypeAndCarrier,
+            carrier: carrier,
           })
           .then((res) => {
             if (res == null) {
