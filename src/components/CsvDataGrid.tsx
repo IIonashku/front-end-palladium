@@ -152,9 +152,13 @@ export default function TableGrid() {
     const toSkip = paginationModel.page * paginationModel.pageSize;
     const limits = paginationModel.pageSize;
     axiosInstance
-      .post("/csv/count", {
-        filters: filters,
-      })
+      .post(
+        "/csv/count",
+        {
+          filters: filters,
+        },
+        { headers: { "Access-Control-Allow-Origin": "*" } }
+      )
       .then((res) => {
         setDataLenght(res.data);
         setCountStatus("Max");
@@ -287,14 +291,22 @@ export default function TableGrid() {
 
   const handleUpdateCarrier = (): void => {
     axiosInstance
-      .post("/csv/count", {
-        filters: {
-          phoneNumber: filters.phoneNumber,
-          listTag: filters.listTag,
-          carrier: "nullTypeAndCarrier",
-          inBase: filters.inBase,
+      .post(
+        "/csv/count",
+        {
+          filters: {
+            phoneNumber: filters.phoneNumber,
+            listTag: filters.listTag,
+            carrier: "nullTypeAndCarrier",
+            inBase: filters.inBase,
+          },
         },
-      })
+        {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
       .then((res) => {
         if (res == null) {
           return;
@@ -674,60 +686,53 @@ function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
       <IconButton
         disabled={
           props.page * props.pageSize + props.pageSize >= props.maxDataNumber
-        }>
-        <Button
-          style={{
-            padding: 8,
-            maxWidth: "24px",
-            maxHeight: "24px",
-            minWidth: "24px",
-            minHeight: "24px",
-          }}
-          sx={{
-            ...(props.page * props.pageSize + props.pageSize >=
-              props.maxDataNumber && {
-              color: "grey",
-            }),
-            color: "black",
-          }}
-          disabled={
-            props.page * props.pageSize + props.pageSize >= props.maxDataNumber
-          }
-          type="button"
-          onClick={() => {
-            props.changePage({
-              page: props.page + 1,
-              pageSize: props.pageSize,
-            });
-          }}>
-          <ChevronRightIcon />
-        </Button>
+        }
+        style={{
+          padding: 8,
+          maxWidth: "36px",
+          maxHeight: "36px",
+          minWidth: "36px",
+          minHeight: "36px",
+        }}
+        sx={{
+          ...(props.page * props.pageSize + props.pageSize >=
+            props.maxDataNumber && {
+            color: "grey",
+          }),
+          color: "black",
+        }}
+        type="button"
+        onClick={() => {
+          props.changePage({
+            page: props.page + 1,
+            pageSize: props.pageSize,
+          });
+        }}>
+        <ChevronRightIcon />
       </IconButton>
-      <IconButton disabled={props.page === 0}>
-        <Button
-          sx={{
-            ...(props.page * props.pageSize + props.pageSize >=
-              props.maxDataNumber && {
-              color: "grey",
-            }),
-            color: "black",
-          }}
-          disabled={props.page === 0}
-          style={{
-            padding: 8,
-            maxWidth: "24px",
-            maxHeight: "24px",
-            minWidth: "24px",
-            minHeight: "24px",
-          }}
-          onClick={() => {
-            props.changePage({
-              page: props.page - 1,
-              pageSize: props.pageSize,
-            });
-          }}>
-          <ChevronLeftIcon />
-        </Button>
+      <IconButton
+        disabled={props.page === 0}
+        sx={{
+          ...(props.page * props.pageSize + props.pageSize >=
+            props.maxDataNumber && {
+            color: "grey",
+          }),
+          color: "black",
+        }}
+        style={{
+          padding: 8,
+          maxWidth: "36px",
+          maxHeight: "36px",
+          minWidth: "36px",
+          minHeight: "36px",
+        }}
+        onClick={() => {
+          props.changePage({
+            page: props.page - 1,
+            pageSize: props.pageSize,
+          });
+        }}>
+        <ChevronLeftIcon />
       </IconButton>
       <Typography style={{ padding: 8 }}>{props.status}</Typography>
       <Typography style={{ padding: 8 }}>

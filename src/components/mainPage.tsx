@@ -14,7 +14,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { defaultTheme } from "../themes/theme.ts";
 import { MainListItems } from "./listitems.tsx";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import { Backdrop, Button } from "@mui/material";
+import { Backdrop } from "@mui/material";
 import { Notifications } from "./Notification.tsx";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link, useNavigate } from "react-router-dom";
@@ -137,28 +137,24 @@ export default function Main({ Element }) {
               sx={{ flexGrow: 1 }}>
               Csv
             </Typography>
-            <IconButton color="secondary">
+            <IconButton
+              color="secondary"
+              onClick={() => {
+                handleOpenNotification(!openNotification);
+              }}>
               <Badge
                 badgeContent={notificationStrings.length}
                 style={{ color: "white" }}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    handleOpenNotification(!openNotification);
-                  }}>
-                  <NotificationsIcon />
-                </Button>
+                <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton color="secondary">
+            <IconButton
+              style={{ paddingLeft: "15px" }}
+              onClick={() => {
+                handleLogout();
+              }}>
               <Link to={"/"}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    handleLogout();
-                  }}>
-                  <LogoutIcon />
-                </Button>
+                <LogoutIcon style={{ color: "#ffffff" }} />
               </Link>
             </IconButton>
             <Backdrop
