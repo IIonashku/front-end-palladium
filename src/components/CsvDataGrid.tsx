@@ -27,6 +27,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { debounce } from "@mui/material/utils";
 import { availableCarrier } from "../config.ts";
+import LinearProgressWithLabel from "./LinearProgressWithLabel.tsx";
 
 type tableData = {
   _id: string;
@@ -128,6 +129,7 @@ export default function TableGrid() {
   const [displaingValues, setDisplaingValues] = React.useState<string[]>([]);
   const [phoneFilterError, setPhoneFilterError] = React.useState(false);
   const [tagFilterError, setTagFilterError] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
 
   const updateCarrierRef = React.useRef<any>();
 
@@ -206,7 +208,29 @@ export default function TableGrid() {
       inBase: undefined,
     };
     refreshPage();
+    axiosInstance.get("/csv/check/export/reading").then((res) => {
+      if (res == null) {
+        return;
+      }
+      if (res.data.exportedData !== 0 && res.data.dataLimit !== 0)
+        setProgress((res.data.exportedData / res.data.dataLimit) * 100);
+      else setProgress(0);
+    });
   }
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      axiosInstance.get("/csv/check/export/reading").then((res: any) => {
+        if (res.data.exportedData !== 0 && res.data.dataLimit !== 0)
+          setProgress((res.data.exportedData / res.data.dataLimit) * 100);
+        else setProgress(0);
+      });
+    }, 5000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  });
 
   const handleExport = () => {
     axiosInstance
@@ -228,6 +252,8 @@ export default function TableGrid() {
         }
         successfulToast("File fully created");
       });
+    successfulToast("Exporting started");
+    setExportFile("");
   };
 
   const handleApply = () => {
@@ -629,6 +655,7 @@ export default function TableGrid() {
             Export to file
           </Button>
         </Box>
+        <LinearProgressWithLabel value={progress} />
       </Box>
     </div>
   );
@@ -734,7 +761,9 @@ function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
         }}>
         <ChevronLeftIcon />
       </IconButton>
-      <Typography style={{ padding: 8 }}>{props.status}</Typography>
+      <Typography style={{ padding: 8 }}>
+        {props.status ? props.status : "Err"}
+      </Typography>
       <Typography style={{ padding: 8 }}>
         {props.page && props.pageSize ? props.page * props.pageSize : 0} -{" "}
         {props.maxDataNumber}{" "}

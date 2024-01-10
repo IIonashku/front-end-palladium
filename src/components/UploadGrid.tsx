@@ -5,8 +5,6 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  LinearProgress,
-  LinearProgressProps,
   Typography,
 } from "@mui/material";
 import axios from "axios";
@@ -14,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { errorToast, successfulToast } from "../functions/toast.message.ts";
 import { axiosInstance } from "../axios.instance.ts";
 import { backEndUrl } from "../config.ts";
+import LinearProgressWithLabel from "./LinearProgressWithLabel.tsx";
 
 const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
@@ -248,22 +247,5 @@ export default function Upload() {
         <LinearProgressWithLabel sx={{ marginTop: 10 }} value={progress} />
       </Box>
     </div>
-  );
-}
-
-function LinearProgressWithLabel(
-  props: LinearProgressProps & { value: number }
-) {
-  return (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
-      <Box sx={{ width: "100%", mr: 1 }}>
-        <LinearProgress variant="determinate" {...props} />
-      </Box>
-      <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" color="text.secondary">{`${Math.round(
-          props.value
-        )}%`}</Typography>
-      </Box>
-    </Box>
   );
 }
