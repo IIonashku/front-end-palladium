@@ -27,6 +27,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { debounce } from "@mui/material/utils";
 import { availableCarrier } from "../config.ts";
+import PropTypes from "prop-types";
 import LinearProgressWithLabel from "./LinearProgressWithLabel.tsx";
 
 type tableData = {
@@ -660,7 +661,6 @@ export default function TableGrid() {
     </div>
   );
 }
-
 declare module "@mui/x-data-grid" {
   interface FooterPropsOverrides {
     page: number;
@@ -673,9 +673,19 @@ declare module "@mui/x-data-grid" {
   }
 }
 
+CustomFooter.propTypes = {
+  page: PropTypes.number.isRequired,
+  pageSize: PropTypes.number.isRequired,
+  maxDataNumber: PropTypes.number.isRequired,
+  changePage: PropTypes.func.isRequired,
+  status: PropTypes.string.isRequired,
+  changeDisplayOptions: PropTypes.func.isRequired,
+  displaingValues: PropTypes.array.isRequired,
+};
+
 function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
   const rowOptions = [5, 10, 25, 50, 100];
-  const [displaingRows, setDisplaingRows] = React.useState<number>(10);
+  const [displaingRows, setDisplaingRows] = React.useState<number>(25);
   const [displaingValues, setDisplaingValues] = React.useState<string[]>([]);
   const displayOptions = [
     "phoneNumber",
@@ -686,6 +696,12 @@ function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
     "inBase",
     "listTag",
   ];
+  if (props.page === undefined) props.page = 0;
+  if (props.pageSize === undefined) props.pageSize = 5;
+  if (props.maxDataNumber === undefined) props.maxDataNumber = 0;
+  if (props.status === undefined) props.status = "Max";
+  if (props.changePage === undefined) props.changePage = (): void => {};
+
   function handleChangePage(event: SelectChangeEvent<number>): void {
     setDisplaingRows(Number(event.target.value));
     props.changePage({ page: props.page, pageSize: event.target.value });
@@ -698,18 +714,17 @@ function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
     }
   };
 
-  if (props.page === undefined) props.page = 0;
-  if (props.pageSize === undefined) props.pageSize = 5;
-  if (props.maxDataNumber === undefined) props.maxDataNumber = 0;
-  if (props.status === undefined) props.status = "Max";
   return (
     <div
+      className="props.name"
+      id={props.id}
       style={{
         padding: 10,
         display: "flex",
         flexDirection: "row-reverse",
         alignItems: "center",
       }}>
+      {props.children}
       <IconButton
         disabled={
           props.page * props.pageSize + props.pageSize >= props.maxDataNumber

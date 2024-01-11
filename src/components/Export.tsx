@@ -61,10 +61,12 @@ export function Export() {
     if (action === "DBInfo") {
       axiosInstance.get("/csv/analisys/all/set/").then((res) => {
         console.log(res.data);
+        successfulToast("Updating data complited");
       });
     } else if (action === "listTag") {
       axiosInstance.get("/csv/analisys/tags/set/").then((res) => {
         console.log(res.data);
+        successfulToast("Updating data tags complited");
       });
     }
     handleClose();
