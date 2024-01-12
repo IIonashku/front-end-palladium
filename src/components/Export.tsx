@@ -222,6 +222,7 @@ export function Export() {
                 display: "inline-block",
                 paddingTop: 10,
               }}
+              disabled={exportFiles.length === 0}
               onClick={() => {
                 downloadAll();
               }}>

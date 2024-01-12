@@ -669,7 +669,6 @@ declare module "@mui/x-data-grid" {
     changePage: Function;
     status: string;
     changeDisplayOptions: Function;
-    displaingValues: string[];
   }
 }
 
@@ -680,7 +679,6 @@ CustomFooter.propTypes = {
   changePage: PropTypes.func.isRequired,
   status: PropTypes.string.isRequired,
   changeDisplayOptions: PropTypes.func.isRequired,
-  displaingValues: PropTypes.array.isRequired,
 };
 
 function CustomFooter(props: NonNullable<GridSlotsComponentsProps["footer"]>) {
