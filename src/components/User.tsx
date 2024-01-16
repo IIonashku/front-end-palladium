@@ -68,6 +68,9 @@ export function User() {
           return;
         }
         successfulToast(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -80,6 +83,9 @@ export function User() {
         })
         .then((res) => {
           successfulToast("Password changed successfully");
+        })
+        .catch((error) => {
+          console.log(error);
         });
     }
   };
@@ -94,6 +100,9 @@ export function User() {
         .then((res) => {
           successfulToast("Username changed successfully");
           getUser();
+        })
+        .catch((error) => {
+          console.log(error);
         });
     }
   };

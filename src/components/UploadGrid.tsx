@@ -115,7 +115,7 @@ export default function Upload() {
     setStatus("Reading");
     if (update)
       axiosInstance
-        .post("/csv/update", formData, {
+        .post("/csv/upload/update", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -142,7 +142,7 @@ export default function Upload() {
         });
     else {
       axiosInstance
-        .post("/csv/upload", formData, {
+        .post("/csv/upload/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
