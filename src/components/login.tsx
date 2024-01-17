@@ -52,7 +52,8 @@ export default function Login() {
         localStorage.refresh_token = res.data.refresh_token;
         axiosInstance.defaults.headers.common[
           "Authorization"
-        ] = `Bearer ${localStorage.access_token}`;
+        ] = `Bearer ${res.data.access_token}`;
+        axiosInstance.defaults.headers.refresh_token = `Bearer ${res.data.refresh_token}`;
         navigate("/data");
         return res.data;
       })

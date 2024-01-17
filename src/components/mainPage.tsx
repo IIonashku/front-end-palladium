@@ -109,8 +109,8 @@ export default function Main({ Element }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+    localStorage.access_token = undefined;
+    localStorage.refresh_token = undefined;
     navigate("/");
   };
 

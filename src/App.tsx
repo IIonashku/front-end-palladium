@@ -8,15 +8,29 @@ import { User } from "./components/User.tsx";
 import TagList from "./components/TagList.tsx";
 import { Export } from "./components/Export.tsx";
 import { NotFound } from "./components/NotFoundPage.tsx";
-
-export let isLogIn = false;
-
-export const logout = () => {
-  console.log(isLogIn);
-  isLogIn = !isLogIn;
-};
+import { axiosInstance } from "./axios.instance.ts";
 
 function App() {
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      axiosInstance
+        .get("/auth/refresh/")
+        .then((res) => {
+          localStorage.access_token = res.data.access_token;
+          localStorage.refresh_token = res.data.refresh_token;
+          axiosInstance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${res.data.access_token}`;
+          axiosInstance.defaults.headers.refresh_token = `Bearer ${res.data.refresh_token}`;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 3600000);
+    return () => {
+      clearInterval(timer);
+    };
+  });
   return (
     <div>
       <BrowserRouter>
