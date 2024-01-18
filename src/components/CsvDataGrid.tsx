@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox,
   Chip,
+  Dialog,
   FormControl,
   IconButton,
   Input,
@@ -209,7 +210,7 @@ export default function TableGrid() {
       inBase: undefined,
     };
     refreshPage();
-    axiosInstance.get("/csv/check/export/reading").then((res) => {
+    axiosInstance.get("/csv/info/export/reading").then((res) => {
       if (res == null) {
         return;
       }
@@ -221,7 +222,7 @@ export default function TableGrid() {
 
   React.useEffect(() => {
     const timer = setInterval(() => {
-      axiosInstance.get("/csv/check/export/reading").then((res: any) => {
+      axiosInstance.get("/csv/info/export/reading").then((res: any) => {
         if (res.data.exportedData !== 0 && res.data.dataLimit !== 0)
           setProgress((res.data.exportedData / res.data.dataLimit) * 100);
         else setProgress(0);
@@ -366,6 +367,8 @@ export default function TableGrid() {
           return;
         }
         console.log(res.data);
+        successfulToast("HLR updated");
+        setOpenOverlay(2);
       });
   };
 
@@ -386,6 +389,9 @@ export default function TableGrid() {
         justifyItems: "baseline",
         width: "76%",
       }}>
+      <Dialog open={openOverlay === 2}>
+        <Button onClick={handleClose}>Close</Button>
+      </Dialog>
       <Box
         sx={{
           width: "100%",

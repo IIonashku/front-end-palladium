@@ -7,7 +7,6 @@ import {
   FormControlLabel,
   Typography,
 } from "@mui/material";
-import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import { errorToast, successfulToast } from "../functions/toast.message.ts";
 import { axiosInstance } from "../axios.instance.ts";
@@ -87,7 +86,7 @@ export default function Upload() {
   if (start) {
     setStart(false);
     pageChange(paginationModel);
-    axios.get(backEndUrl + "/csv/check/reading").then((res) => {
+    axiosInstance.get(backEndUrl + "/csv/info/reading").then((res) => {
       if (res == null) {
         return;
       }
@@ -174,7 +173,7 @@ export default function Upload() {
   React.useEffect(() => {
     const timer = setInterval(() => {
       if (status !== "Uploaded" || fileUploading !== 0)
-        axios.get(backEndUrl + "/csv/check/reading").then((res: any) => {
+        axiosInstance.get(backEndUrl + "/csv/info/reading").then((res: any) => {
           setFileUploading(res.numOfFile);
           setStatus(res.data.status);
           if (res.data.uploadedData !== 0 && res.data.lines !== 0)

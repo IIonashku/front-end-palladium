@@ -9,3 +9,13 @@ export enum availableCarrier {
   verizon = "Verizon Wireless",
   ATT = "AT&T",
 }
+
+export let refresh: boolean = false;
+
+export const toRefresh = () => {
+  refresh = true;
+};
+
+export const refreshed = () => {
+  refresh = false;
+};
