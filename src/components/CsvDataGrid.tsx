@@ -132,6 +132,13 @@ export default function TableGrid() {
   const [phoneFilterError, setPhoneFilterError] = React.useState(false);
   const [tagFilterError, setTagFilterError] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
+  const [HLRUpdateResult, setHLRUpdateResult] = React.useState({
+    landline: 0,
+    mobile: 0,
+    unknown: 0,
+    invalid: 0,
+    canadian: 0,
+  });
 
   const updateCarrierRef = React.useRef<any>();
 
@@ -369,6 +376,7 @@ export default function TableGrid() {
         console.log(res.data);
         successfulToast("HLR updated");
         setOpenOverlay(2);
+        setHLRUpdateResult(res.data);
       });
   };
 
@@ -390,6 +398,11 @@ export default function TableGrid() {
         width: "76%",
       }}>
       <Dialog open={openOverlay === 2}>
+        <Typography>Unknown: {HLRUpdateResult.unknown}</Typography>
+        <Typography>Mobile: {HLRUpdateResult.mobile}</Typography>
+        <Typography>Landline: {HLRUpdateResult.landline}</Typography>
+        <Typography>Invalid: {HLRUpdateResult.invalid}</Typography>
+        <Typography>Canadian: {HLRUpdateResult.canadian}</Typography>
         <Button onClick={handleClose}>Close</Button>
       </Dialog>
       <Box

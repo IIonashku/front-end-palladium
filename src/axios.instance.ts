@@ -15,6 +15,7 @@ axiosInstance.interceptors.request.use(
   async function (config) {
     if (config.method === "options") return config;
     if (refresh) {
+      stay = true;
       refreshed();
       if (localStorage.access_token && localStorage.refresh_token)
         axios
@@ -31,6 +32,7 @@ axiosInstance.interceptors.request.use(
               "Authorization"
             ] = `Bearer ${res.data.access_token}`;
             axiosInstance.defaults.headers.refresh_token = `Bearer ${res.data.refresh_token}`;
+            stay = false;
           });
     } else if (stay) {
       await new Promise((resolve) => setTimeout(resolve, 500));

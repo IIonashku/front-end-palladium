@@ -4,6 +4,10 @@ import {
   Box,
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControlLabel,
   Typography,
 } from "@mui/material";
@@ -12,6 +16,7 @@ import { errorToast, successfulToast } from "../functions/toast.message.ts";
 import { axiosInstance } from "../axios.instance.ts";
 import { backEndUrl } from "../config.ts";
 import LinearProgressWithLabel from "./LinearProgressWithLabel.tsx";
+import { toast } from "react-toastify";
 
 const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
@@ -55,10 +60,12 @@ export default function Upload() {
   const [fileUploading, setFileUploading] = React.useState(0);
   const [update, setUpdate] = React.useState(false);
   const [start, setStart] = React.useState(true);
+  const detailRef = React.useRef<any>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 10,
   });
+  const [details, setDetails] = React.useState<any[]>([]);
 
   const pageChange = (pageInfo) => {
     setLoading(true);
@@ -162,12 +169,23 @@ export default function Upload() {
           setStatus("Readed and uploaded");
           setProgress(100);
           successfulToast("All file has been readed");
+
+          toast.success("Read detail", {
+            onClick: handleOpenDetail,
+          });
+          console.log(res.data.result);
+          setDetails(res.data.result);
         })
         .catch((e) => {
           setStatus("ERROR");
         });
     }
   };
+
+  const handleOpenDetail = (): void => {
+    setOpenDetail(true);
+  };
+  const [openDetail, setOpenDetail] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
@@ -187,6 +205,23 @@ export default function Upload() {
     };
   });
 
+  const handleCloseDetail = () => {
+    setOpenDetail(false);
+  };
+
+  const handleClickOutsideDetail = (event) => {
+    if (detailRef.current && !detailRef.current.contains(event.target)) {
+      setOpenDetail(false);
+    }
+  };
+
+  React.useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutsideDetail);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideDetail);
+    };
+  }, []);
+
   return (
     <div
       style={{
@@ -195,6 +230,41 @@ export default function Upload() {
         width: "96%",
         margin: "2%",
       }}>
+      <Dialog
+        ref={detailRef}
+        open={openDetail}
+        onClose={handleCloseDetail}
+        aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title" style={{ textAlign: "center" }}>
+          Upload file detail
+        </DialogTitle>
+        <DialogContent>
+          {details.map((file) => {
+            console.log(file, 111);
+            if (file.error) {
+              return <Typography>{file.message}</Typography>;
+            } else {
+              return (
+                <Typography>
+                  Filename: {file[1].fileName + "  "}
+                  Duplicate In File: {file[0].duplicateInFile + "  "}
+                  Duplicate In Mongo: {file[0].duplicateInMongo + "  "}
+                  Duplicate In Base: {file[0].duplicateInBase + "  "}
+                  Dad Data: {file[0].badDataCounter + "  "}
+                  Valid Data: {file[0].validDataCounter + "  "}
+                  HLR missing: {file[0].nullTypeAndCarrier + "  "}
+                  Data with ATT Carrier: {file[0].ATTCarrier + "  "}
+                  Data with T-Mobile Carrier: {file[0].TMobileCarrier + "  "}
+                  Data with Verizon Carrier: {file[0].verizonCarrier + "  "}
+                </Typography>
+              );
+            }
+          })}
+        </DialogContent>
+        <Button onClick={handleCloseDetail} color="primary">
+          Close
+        </Button>
+      </Dialog>
       <DataGrid
         sx={{
           marginBottom: 5,
