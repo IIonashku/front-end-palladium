@@ -5,10 +5,13 @@ import {
   Button,
   Checkbox,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  ListItemButton,
+  ListItemText,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,6 +20,7 @@ import { axiosInstance } from "../axios.instance.ts";
 import { backEndUrl } from "../config.ts";
 import LinearProgressWithLabel from "./LinearProgressWithLabel.tsx";
 import { toast } from "react-toastify";
+import { uploadFileResult } from "../types.ts";
 
 const columns: GridColDef[] = [
   { field: "badDataCounter", headerName: "Not Valid", width: 110 },
@@ -60,12 +64,10 @@ export default function Upload() {
   const [fileUploading, setFileUploading] = React.useState(0);
   const [update, setUpdate] = React.useState(false);
   const [start, setStart] = React.useState(true);
-  const detailRef = React.useRef<any>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 10,
   });
-  const [details, setDetails] = React.useState<any[]>([]);
 
   const pageChange = (pageInfo) => {
     setLoading(true);
@@ -157,7 +159,9 @@ export default function Upload() {
           if (res == null) {
             return;
           }
+          const files: string[] = [];
           for (let i = 0; i < res.data.result.length; i++) {
+            files.push(res.data.result[i].filename);
             if (res.data.result[i].error) {
               errorToast(
                 "Duplicate in on of the files" +
@@ -165,6 +169,7 @@ export default function Upload() {
               );
             }
           }
+          setFilenamesDetail(files);
           pageChange(paginationModel);
           setStatus("Readed and uploaded");
           setProgress(100);
@@ -173,7 +178,6 @@ export default function Upload() {
           toast.success("Read detail", {
             onClick: handleOpenDetail,
           });
-          console.log(res.data.result);
           setDetails(res.data.result);
         })
         .catch((e) => {
@@ -207,20 +211,30 @@ export default function Upload() {
 
   const handleCloseDetail = () => {
     setOpenDetail(false);
+    setAnchorEl(null);
+    setSelectedIndex(0);
   };
 
-  const handleClickOutsideDetail = (event) => {
-    if (detailRef.current && !detailRef.current.contains(event.target)) {
-      setOpenDetail(false);
-    }
+  const handleCloseDetailMenu = () => {
+    setAnchorEl(null);
   };
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [filenamesDetail, setFilenamesDetail] = React.useState(["DBInfo"]);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const openDetailInfo = Boolean(anchorEl);
+  const [details, setDetails] = React.useState<uploadFileResult[]>([]);
 
-  React.useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutsideDetail);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutsideDetail);
-    };
-  }, []);
+  function handleClickListItem(event: React.MouseEvent<HTMLElement>): void {
+    setAnchorEl(event.currentTarget);
+  }
+
+  function handleMenuItemClick(
+    event: React.MouseEvent<HTMLElement>,
+    index: number
+  ): void {
+    setSelectedIndex(index);
+    setAnchorEl(null);
+  }
 
   return (
     <div
@@ -230,36 +244,72 @@ export default function Upload() {
         width: "96%",
         margin: "2%",
       }}>
-      <Dialog
-        ref={detailRef}
-        open={openDetail}
-        onClose={handleCloseDetail}
-        aria-labelledby="form-dialog-title">
+      <Dialog open={openDetail} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" style={{ textAlign: "center" }}>
           Upload file detail
         </DialogTitle>
         <DialogContent>
-          {details.map((file) => {
-            console.log(file, 111);
-            if (file.error) {
-              return <Typography>{file.message}</Typography>;
-            } else {
-              return (
-                <Typography>
-                  Filename: {file[1].fileName + "  "}
-                  Duplicate In File: {file[0].duplicateInFile + "  "}
-                  Duplicate In Mongo: {file[0].duplicateInMongo + "  "}
-                  Duplicate In Base: {file[0].duplicateInBase + "  "}
-                  Dad Data: {file[0].badDataCounter + "  "}
-                  Valid Data: {file[0].validDataCounter + "  "}
-                  HLR missing: {file[0].nullTypeAndCarrier + "  "}
-                  Data with ATT Carrier: {file[0].ATTCarrier + "  "}
-                  Data with T-Mobile Carrier: {file[0].TMobileCarrier + "  "}
-                  Data with Verizon Carrier: {file[0].verizonCarrier + "  "}
-                </Typography>
-              );
-            }
-          })}
+          <ListItemButton
+            id="File selector"
+            aria-haspopup="listbox"
+            aria-controls="lock-menu"
+            aria-label="Uploaded file"
+            aria-expanded={openDetailInfo ? "true" : undefined}
+            onClick={handleClickListItem}>
+            <ListItemText
+              primary="Choosed file"
+              secondary={filenamesDetail[selectedIndex]}
+            />
+          </ListItemButton>
+          <Typography
+            sx={{
+              ...(details[selectedIndex]?.error === undefined && {
+                display: "none",
+              }),
+            }}>
+            {details[selectedIndex]?.error?.message + "\n"}
+          </Typography>
+          <Typography
+            sx={{
+              ...(details[selectedIndex]?.file === undefined && {
+                display: "none",
+              }),
+            }}>
+            Filename: {details[selectedIndex]?.filename + "  "}
+            Duplicate In File:{" "}
+            {details[selectedIndex]?.file?.duplicateInFile + "  "}
+            Duplicate In Mongo:{" "}
+            {details[selectedIndex]?.file?.duplicateInMongo + "  "}
+            Duplicate In Base:{" "}
+            {details[selectedIndex]?.file?.duplicateInBase + "  "}
+            Dad Data: {details[selectedIndex]?.file?.badDataCounter + "  "}
+            Valid Data: {details[selectedIndex]?.file?.validDataCounter + "  "}
+            HLR missing:{" "}
+            {details[selectedIndex]?.file?.nullTypeAndCarrier + "  "}
+            ATT Carrier: {details[selectedIndex]?.file?.ATTCarrier + "  "}
+            T-Mobile Carrier:{" "}
+            {details[selectedIndex]?.file?.TMobileCarrier + "  "}
+            Verizon Carrier:{" "}
+            {details[selectedIndex]?.file?.verizonCarrier + "\n"}
+          </Typography>
+          <Menu
+            id="lock-menu"
+            anchorEl={anchorEl}
+            open={openDetailInfo}
+            onClose={handleCloseDetailMenu}
+            MenuListProps={{
+              "aria-labelledby": "lock-button",
+              role: "listbox",
+            }}>
+            {filenamesDetail.map((option, index) => (
+              <MenuItem
+                key={option}
+                selected={index === selectedIndex}
+                onClick={(event) => handleMenuItemClick(event, index)}>
+                {option}
+              </MenuItem>
+            ))}
+          </Menu>
         </DialogContent>
         <Button onClick={handleCloseDetail} color="primary">
           Close

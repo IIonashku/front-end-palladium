@@ -11,6 +11,7 @@ import {
   Checkbox,
   Chip,
   Dialog,
+  DialogTitle,
   FormControl,
   IconButton,
   Input,
@@ -113,7 +114,7 @@ export default function TableGrid() {
   const [dataLenght, setDataLenght] = React.useState(100);
   const [isLoading, setLoading] = React.useState<boolean>(false);
   const [data, setData] = React.useState<tableData[]>([]);
-  const [openOverlay, setOpenOverlay] = React.useState(0);
+  const [openOverlay, setOpenOverlay] = React.useState(2);
   const [start, setStart] = React.useState(true);
   const [listTag, setListTag] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
@@ -373,7 +374,6 @@ export default function TableGrid() {
         if (res == null) {
           return;
         }
-        console.log(res.data);
         successfulToast("HLR updated");
         setOpenOverlay(2);
         setHLRUpdateResult(res.data);
@@ -398,11 +398,14 @@ export default function TableGrid() {
         width: "76%",
       }}>
       <Dialog open={openOverlay === 2}>
-        <Typography>Unknown: {HLRUpdateResult.unknown}</Typography>
-        <Typography>Mobile: {HLRUpdateResult.mobile}</Typography>
-        <Typography>Landline: {HLRUpdateResult.landline}</Typography>
-        <Typography>Invalid: {HLRUpdateResult.invalid}</Typography>
-        <Typography>Canadian: {HLRUpdateResult.canadian}</Typography>
+        <DialogTitle> Update HLM detail</DialogTitle>
+        <div style={{ padding: 10 }}>
+          <Typography>Unknown: {HLRUpdateResult.unknown}</Typography>
+          <Typography>Mobile: {HLRUpdateResult.mobile}</Typography>
+          <Typography>Landline: {HLRUpdateResult.landline}</Typography>
+          <Typography>Invalid: {HLRUpdateResult.invalid}</Typography>
+          <Typography>Canadian: {HLRUpdateResult.canadian}</Typography>
+        </div>
         <Button onClick={handleClose}>Close</Button>
       </Dialog>
       <Box
